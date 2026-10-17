@@ -117,7 +117,7 @@ export default function HomePage() {
       {/* Hero */}
       <section
         id="home"
-        className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:px-8 md:py-28 lg:grid-cols-2 lg:gap-16"
+        className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-5 pt-20 pb-10 sm:px-8 md:pb-18 md:pt-28 lg:grid-cols-2 lg:gap-16"
       >
         <div>
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-violet-400/25 bg-violet-500/10 px-4 py-2 text-sm text-violet-200">
@@ -447,7 +447,7 @@ export default function HomePage() {
       {/* Features */}
       <section
         id="features"
-        className="relative z-10 mx-auto max-w-7xl px-5 pb-20 sm:px-8 md:pb-28"
+        className="relative z-10 mx-auto max-w-7xl px-5 pb-20 pt-10 sm:px-8 md:pb-28"
       >
         <div className="mb-10 max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-300">
