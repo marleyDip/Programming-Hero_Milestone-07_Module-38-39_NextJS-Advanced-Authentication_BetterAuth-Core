@@ -12,6 +12,7 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
+
 import {
   ArrowRight,
   Eye,
@@ -19,6 +20,7 @@ import {
   LoaderCircle,
   LockKeyhole,
   Mail,
+  MoveRight,
   ShieldCheck,
   UserPlus,
   UserRound,
@@ -26,6 +28,24 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+
+/* export const metadata = {
+  title: "Create Account",
+  description:
+    "Create your NextAuth Pro account with secure authentication powered by BetterAuth. Sign up using email, Google, or GitHub.",
+
+  robots: {
+    index: false,
+    follow: false,
+  },
+
+  openGraph: {
+    title: "Create Account | NextAuth Pro",
+    description:
+      "Get started with NextAuth Pro for secure, seamless authentication and user management.",
+    type: "website",
+  },
+}; */
 
 const inputClass =
   "rounded-xl border border-white/15 bg-white/[0.04] text-white shadow-sm transition focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-500/20";
@@ -160,15 +180,34 @@ export default function SignUpPage() {
           </div>
         </Link>
 
+        {/* Glassmorphism Pill Button */}
         <div className="hidden items-center gap-3 text-sm text-slate-400 sm:flex">
+          <span className="text-slate-400/90">Already have an account?</span>
+
+          <Link
+            href="/sign-in"
+            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-violet-400/20 bg-white/4 px-4 py-2 font-semibold text-violet-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-400/50 hover:bg-violet-500/10 hover:text-violet-200 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_6px_24px_rgba(139,92,246,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          >
+            <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/6 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
+            <span className="relative">Sign in</span>
+
+            <MoveRight
+              size={15}
+              className="relative transition-transform duration-300 group-hover:translate-x-1"
+            />
+          </Link>
+        </div>
+
+        {/* <div className="hidden items-center gap-3 text-sm text-slate-400 sm:flex">
           Already have an account?
           <Link
-            href="/signin"
+            href="/sign-in"
             className="font-semibold text-violet-400 transition hover:text-violet-300"
           >
             Sign in <ArrowRight className="ml-1 inline" size={15} />
           </Link>
-        </div>
+        </div> */}
       </header>
 
       {/* Main layout */}
@@ -177,12 +216,12 @@ export default function SignUpPage() {
         <div className="hidden lg:block">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/10 px-4 py-2 text-sm text-violet-200">
             <LockKeyhole size={16} />
-            Next.js + BetterAuth
+            Next.js & BetterAuth
           </div>
 
           <h1 className="max-w-lg text-5xl font-bold leading-tight tracking-tight xl:text-6xl">
             Create your{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-indigo-300 to-lime-300 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-violet-400 via-indigo-300 to-lime-300 bg-clip-text text-transparent">
               account
             </span>
           </h1>
@@ -211,9 +250,10 @@ export default function SignUpPage() {
               },
             ].map(({ icon: Icon, title, description }) => (
               <div key={title} className="flex items-center gap-4">
-                <div className="grid size-14 shrink-0 place-items-center rounded-2xl border border-violet-400/20 bg-white/[0.04] text-violet-300">
+                <div className="grid size-14 shrink-0 place-items-center rounded-2xl border border-violet-400/20 bg-white/4 text-violet-300">
                   <Icon size={25} />
                 </div>
+
                 <div>
                   <p className="font-semibold">{title}</p>
                   <p className="mt-1 text-sm text-slate-400">{description}</p>
@@ -223,7 +263,7 @@ export default function SignUpPage() {
           </div>
 
           <div className="mt-12 flex h-40 max-w-md items-center justify-center">
-            <div className="relative grid size-32 place-items-center rounded-[2rem] border border-violet-400/30 bg-gradient-to-br from-violet-500/20 to-indigo-500/5 shadow-[0_0_80px_rgba(139,92,246,0.18)]">
+            <div className="relative grid size-32 place-items-center rounded-[2rem] border border-violet-400/30 bg-linear-to-br from-violet-500/20 to-indigo-500/5 shadow-[0_0_80px_rgba(139,92,246,0.18)]">
               <ShieldCheck size={66} className="text-violet-300" />
               <div className="absolute -right-3 -top-3 size-5 animate-pulse rounded-full bg-lime-300 shadow-[0_0_20px_rgba(190,242,100,0.5)]" />
             </div>
@@ -232,7 +272,7 @@ export default function SignUpPage() {
 
         {/* Sign-up card */}
         <div className="mx-auto w-full max-w-lg">
-          <div className="rounded-3xl border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/20 backdrop-blur-2xl sm:p-8">
+          <div className="rounded-3xl border border-white/10 bg-white/4.5 p-5 shadow-2xl shadow-black/20 backdrop-blur-2xl sm:p-8">
             <div className="mb-7">
               <div className="mb-5 grid size-14 place-items-center rounded-2xl border border-violet-400/25 bg-violet-500/15 text-violet-300">
                 <UserPlus size={29} />
@@ -264,6 +304,7 @@ export default function SignUpPage() {
                       <UserRound size={16} />
                       Full Name
                     </Label>
+
                     <Input
                       className={inputClass}
                       placeholder="John Doe"
@@ -277,6 +318,7 @@ export default function SignUpPage() {
                       }}
                       autoComplete="name"
                     />
+
                     <FieldError />
                     {errors.name && (
                       <p className="mt-1 text-xs text-rose-400">
@@ -291,6 +333,7 @@ export default function SignUpPage() {
                       <Mail size={16} />
                       Email Address
                     </Label>
+
                     <Input
                       className={inputClass}
                       placeholder="john@example.com"
@@ -304,6 +347,7 @@ export default function SignUpPage() {
                       }}
                       autoComplete="email"
                     />
+
                     <FieldError />
                     {errors.email && (
                       <p className="mt-1 text-xs text-rose-400">
@@ -343,6 +387,7 @@ export default function SignUpPage() {
                         }}
                         autoComplete="new-password"
                       />
+
                       <button
                         type="button"
                         aria-label={
@@ -383,6 +428,7 @@ export default function SignUpPage() {
                             />
                           ))}
                         </div>
+
                         <p className="mt-2 text-xs text-slate-400">
                           Password strength:{" "}
                           <span className="text-slate-200">
@@ -425,6 +471,7 @@ export default function SignUpPage() {
                         }}
                         autoComplete="new-password"
                       />
+
                       <button
                         type="button"
                         aria-label={
@@ -463,24 +510,40 @@ export default function SignUpPage() {
                 </p>
               )}
 
-              {/* Submit */}
+              {/* Submit Neo-Glass Button */}
               <Button
                 type="submit"
                 isDisabled={loading || Boolean(socialLoading)}
-                className="w-full rounded-xl bg-gradient-to-r from-violet-600 via-indigo-500 to-lime-300 py-3 font-semibold text-white shadow-lg shadow-violet-600/20 transition hover:brightness-110"
+                className="group relative w-full overflow-hidden rounded-xl border border-violet-400/25 bg-[#171323] py-4.5 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 hover:border-violet-400/60 hover:bg-[#211a35] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_25px_rgba(139,92,246,0.18)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading ? (
-                  <>
-                    <LoaderCircle size={18} className="animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  <>
-                    <UserPlus size={18} />
-                    Create Account
-                    <ArrowRight size={17} />
-                  </>
-                )}
+                <span className="pointer-events-none absolute inset-0 bg-linear-to-r from-violet-500/8 via-fuchsia-400/4 to-indigo-500/8 opacity-70 transition-opacity duration-300 group-hover:opacity-100" />
+
+                <span className="pointer-events-none absolute -left-1/2 top-0 h-px w-1/2 bg-linear-to-r from-transparent via-violet-300 to-transparent transition-transform duration-700 group-hover:translate-x-[300%]" />
+
+                <span className="relative flex items-center justify-center gap-2.5">
+                  {loading ? (
+                    <>
+                      <LoaderCircle
+                        size={18}
+                        className="animate-spin text-violet-300"
+                      />
+                      Creating account...
+                    </>
+                  ) : (
+                    <>
+                      <span className="flex size-7 items-center justify-center rounded-lg border border-violet-300/20 bg-violet-400/10 text-violet-300 transition-all duration-300 group-hover:border-violet-300/40 group-hover:bg-violet-400/20">
+                        <UserPlus size={16} />
+                      </span>
+
+                      <span className="tracking-wide">Create Account</span>
+
+                      <ArrowRight
+                        size={17}
+                        className="text-violet-300 transition-transform duration-300 group-hover:translate-x-1"
+                      />
+                    </>
+                  )}
+                </span>
               </Button>
             </Form>
 
@@ -498,7 +561,7 @@ export default function SignUpPage() {
                 variant="secondary"
                 isDisabled={loading || Boolean(socialLoading)}
                 onPress={() => handleSocialSignUp("google")}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] py-3 text-sm text-white transition hover:bg-white/[0.08]"
+                className="w-full rounded-xl border border-white/10 bg-white/3 py-3 text-sm text-white transition hover:bg-white/8"
               >
                 {socialLoading === "google" ? (
                   <LoaderCircle size={18} className="animate-spin" />
@@ -538,7 +601,7 @@ export default function SignUpPage() {
                 variant="secondary"
                 isDisabled={loading || Boolean(socialLoading)}
                 onPress={() => handleSocialSignUp("github")}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] py-3 text-sm text-white transition hover:bg-white/[0.08]"
+                className="w-full rounded-xl border border-white/10 bg-white/3 py-3 text-sm text-white transition hover:bg-white/8"
               >
                 {socialLoading === "github" ? (
                   <LoaderCircle size={18} className="animate-spin" />
@@ -570,24 +633,134 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          <p className="mt-6 text-center text-sm text-slate-400">
+          <div className="mt-7 flex items-center justify-center gap-2.5 rounded-2xl border border-white/8 bg-white/3 px-4 py-3.5 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl">
+            <span className="text-slate-400">Already have an account?</span>
+
+            <Link
+              href="/sign-in"
+              className="group inline-flex items-center gap-1.5 font-semibold text-violet-300 transition-colors duration-300 hover:text-fuchsia-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 rounded-md"
+            >
+              Sign In
+              <ArrowRight
+                size={15}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </Link>
+          </div>
+
+          {/* <p className="mt-6 text-center text-sm text-slate-400">
             Already have an account?{" "}
             <Link
-              href="/signin"
+              href="/sign-in"
               className="font-semibold text-violet-300 transition hover:text-violet-200"
             >
               Sign in →
             </Link>
-          </p>
+          </p> */}
         </div>
       </section>
 
+      {/* Footer */}
       <footer className="relative z-10 mt-8 border-t border-white/10 px-5 py-6 sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 text-xs text-slate-500 sm:flex-row">
           <p>© {new Date().getFullYear()} NextAuth Pro</p>
           <p>Built with ❤️ using Next.js, HeroUI & BetterAuth</p>
+
+          <p className="group text-xs text-slate-500">
+            Crafted with care by{" "}
+            <a
+              href="https://marleydip.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative inline-flex items-center gap-1.5 font-semibold text-slate-300 transition-all duration-300 hover:text-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            >
+              <span className="bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent transition-all duration-300 group-hover:from-fuchsia-300 group-hover:to-violet-300">
+                Md Sofian Hasan
+              </span>
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="size-3.5 text-violet-400 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              >
+                <path d="M7 17 17 7" />
+                <path d="M7 7h10v10" />
+              </svg>
+
+              <span className="absolute -bottom-1 left-0 h-px w-0 bg-linear-to-r from-violet-400 to-fuchsia-400 transition-all duration-300 group-hover:w-full" />
+            </a>
+          </p>
+
+          {/* <p>
+            Developed by{" "}
+            <a
+              href="https://marleydip.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-slate-300 transition-colors duration-300 hover:text-violet-400"
+            >
+              Sofian Hasan
+            </a>
+          </p> */}
         </div>
       </footer>
     </main>
   );
 }
+
+/* 
+<Button
+    type="submit"
+    isDisabled={loading || Boolean(socialLoading)}
+    className="w-full rounded-xl bg-linear-to-r from-violet-600 via-indigo-500 to-lime-300 py-3 font-semibold text-white shadow-lg shadow-violet-600/20 transition hover:brightness-110"
+    >
+    {loading ? (
+        <>
+        <LoaderCircle size={18} className="animate-spin" />
+        Creating account...
+        </>
+    ) : (
+        <>
+        <UserPlus size={18} />
+        Create Account
+        <ArrowRight size={17} />
+        </>
+    )}
+    </Button>
+
+    <Button
+    type="submit"
+    isDisabled={loading || Boolean(socialLoading)}
+    className="group relative w-full overflow-hidden rounded-xl border border-white/15 bg-linear-to-r from-violet-600 via-indigo-500 to-violet-500 py-3.5 font-semibold text-white shadow-[0_8px_30px_rgba(124,58,237,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300/40 hover:shadow-[0_12px_35px_rgba(124,58,237,0.35),inset_0_1px_0_rgba(255,255,255,0.25)] active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+    >
+    <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
+    <span className="relative flex items-center justify-center gap-2.5">
+        {loading ? (
+        <>
+            <LoaderCircle size={18} className="animate-spin" />
+            Creating account...
+        </>
+        ) : (
+        <>
+            <UserPlus
+            size={18}
+            className="transition-transform duration-300 group-hover:scale-110"
+            />
+            <span>Create Account</span>
+            <ArrowRight
+            size={17}
+            className="transition-transform duration-300 group-hover:translate-x-1"
+            />
+        </>
+        )}
+    </span>
+</Button>
+
+*/
