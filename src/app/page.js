@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  CheckCircle2,
   Code2,
   LockKeyhole,
   ShieldCheck,
@@ -7,6 +8,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+
 import Link from "next/link";
 
 const features = [
@@ -141,7 +143,7 @@ export default function HomePage() {
           </p>
 
           <div className="mt-9 flex flex-wrap gap-4">
-            <Link
+            {/* <Link
               href="/sign-up"
               className="group inline-flex items-center gap-3 rounded-xl bg-linear-to-r from-violet-600 via-indigo-500 to-lime-300 px-7 py-3.5 font-semibold shadow-xl shadow-violet-600/20 transition hover:-translate-y-1 hover:brightness-110"
             >
@@ -150,13 +152,36 @@ export default function HomePage() {
                 size={19}
                 className="transition-transform group-hover:translate-x-1"
               />
-            </Link>
+            </Link> */}
 
             <Link
+              href="/sign-up"
+              className="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-xl border border-white/15 bg-linear-to-r from-violet-600 via-indigo-500 to-lime-300 px-7 py-3.5 font-semibold text-white shadow-[6px_6px_14px_rgba(5,8,25,0.45),-3px_-3px_12px_rgba(139,92,246,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:brightness-110 hover:shadow-[8px_8px_20px_rgba(5,8,25,0.5),0_0_24px_rgba(139,92,246,0.3)] active:translate-y-0 active:scale-[0.97] active:shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080b19]"
+            >
+              <span className="absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+              <span className="relative">Get Started</span>
+            </Link>
+
+            {/* <Link
               href="/sign-in"
               className="inline-flex items-center justify-center rounded-xl border border-violet-400/40 px-7 py-3.5 font-semibold transition hover:border-violet-300 hover:bg-violet-500/10"
             >
               Sign In
+            </Link> */}
+
+            <Link
+              href="/sign-in"
+              className="group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-xl border border-white/8 bg-[#111329] px-7 py-3.5 font-semibold text-slate-200 shadow-[6px_6px_14px_#070916,-6px_-6px_14px_#191d3b] transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-400/30 hover:text-white hover:shadow-[4px_4px_12px_#070916,-4px_-4px_12px_#191d3b,0_0_22px_rgba(139,92,246,0.16)] active:translate-y-0 active:scale-[0.97] active:shadow-[inset_4px_4px_10px_#070916,inset_-4px_-4px_10px_#191d3b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080b19]"
+            >
+              <span className="absolute inset-0 bg-linear-to-r from-violet-500/0 via-violet-400/[0.07] to-cyan-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+              <span className="relative">Sign In</span>
+
+              <ArrowRight
+                size={17}
+                className="relative text-violet-300 transition-transform duration-300 group-hover:translate-x-1"
+              />
             </Link>
           </div>
 
@@ -174,7 +199,7 @@ export default function HomePage() {
         </div>
 
         {/* Visual authentication preview */}
-        <div className="relative mx-auto flex min-h-90 w-full max-w-lg items-center justify-center sm:min-h-107.5">
+        {/* <div className="relative mx-auto flex min-h-90 w-full max-w-lg items-center justify-center sm:min-h-107.5">
           <div className="absolute inset-8 rounded-full bg-violet-600/20 blur-[80px]" />
 
           <div className="absolute h-64 w-64 rounded-full border border-violet-400/20 sm:h-80 sm:w-80" />
@@ -238,6 +263,183 @@ export default function HomePage() {
           <div className="absolute bottom-8 right-0 rounded-xl border border-lime-300/20 bg-[#11152b]/90 px-4 py-3 text-sm text-slate-200 shadow-xl backdrop-blur-xl sm:bottom-10">
             <span className="mr-2 text-lime-300">✓</span>
             Your data, your control
+          </div>
+        </div> */}
+
+        {/* Premium authentication visual */}
+        <div className="relative mx-auto flex min-h-110 w-full max-w-xl items-center justify-center overflow-hidden sm:min-h-130 lg:min-h-145">
+          {/* Ambient glow */}
+          <div className="pointer-events-none absolute left-1/2 top-1/2 size-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/20 blur-[90px] sm:size-96" />
+
+          <div className="pointer-events-none absolute right-5 top-16 size-32 rounded-full bg-cyan-500/10 blur-[70px]" />
+
+          <div className="pointer-events-none absolute bottom-10 left-5 size-32 rounded-full bg-lime-400/10 blur-[70px]" />
+
+          {/* Orbit rings */}
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rotate-[-25deg] rounded-full border border-violet-400/30 sm:h-96 sm:w-96">
+            <span className="absolute left-[14%] top-[12%] size-2 rounded-full bg-violet-300 shadow-[0_0_18px_5px_rgba(167,139,250,0.65)]" />
+
+            <span className="absolute bottom-[12%] right-[15%] size-2 rounded-full bg-lime-300 shadow-[0_0_18px_5px_rgba(190,242,100,0.5)]" />
+          </div>
+
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-52 w-72 -translate-x-1/2 -translate-y-1/2 rotate-30 rounded-[50%] border border-cyan-300/20 sm:h-64 sm:w-105" />
+
+          {/* Floating BetterAuth badge */}
+          <div className="absolute left-1 top-8 z-30 animate-[float_5s_ease-in-out_infinite] rounded-2xl border border-violet-400/30 bg-[#11152b]/90 p-3 shadow-[0_10px_40px_rgba(124,58,237,0.2)] backdrop-blur-xl sm:left-3 sm:top-12 sm:px-5 sm:py-4">
+            <div className="flex items-center gap-3">
+              <div className="grid size-10 place-items-center rounded-xl bg-violet-500/15 text-violet-300">
+                <LockKeyhole size={20} />
+              </div>
+
+              <div>
+                <p className="text-sm font-bold text-white">BetterAuth</p>
+                <p className="mt-0.5 text-[10px] text-slate-400">
+                  Authentication layer
+                </p>
+              </div>
+
+              <span className="ml-1 rounded-full bg-lime-300/10 px-2 py-1 text-[10px] font-semibold text-lime-300">
+                Secure
+              </span>
+            </div>
+          </div>
+
+          {/* Main glass dashboard */}
+          <div className="relative z-20 w-[88%] max-w-102.5 -rotate-3 rounded-[28px] border border-indigo-300/30 bg-linear-to-br from-[#18203d]/95 via-[#0d1229]/95 to-[#10152a]/95 p-5 shadow-[0_30px_100px_rgba(76,29,149,0.28)] backdrop-blur-2xl transition duration-500 hover:rotate-0 hover:border-violet-300/50 hover:shadow-[0_30px_100px_rgba(124,58,237,0.3)] sm:p-7">
+            {/* Card highlight */}
+            <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-linear-to-r from-transparent via-violet-300/80 to-transparent" />
+
+            {/* Header */}
+            <div className="mb-7 flex items-start justify-between gap-3">
+              <div>
+                <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-violet-300">
+                  <Sparkles size={13} />
+                  Identity protection
+                </div>
+
+                <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  Welcome <span className="text-violet-300">Back</span>
+                </h3>
+
+                <p className="mt-2 text-sm text-slate-400">
+                  Your security starts here.
+                </p>
+              </div>
+
+              <div className="grid size-12 shrink-0 place-items-center rounded-2xl border border-violet-300/25 bg-linear-to-br from-violet-500/20 to-indigo-500/10 text-violet-300 shadow-inner shadow-violet-400/10">
+                <ShieldCheck size={27} />
+              </div>
+            </div>
+
+            {/* Security feature rows */}
+            <div className="space-y-3">
+              <div className="group flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.035] p-3.5 transition hover:border-violet-400/30 hover:bg-violet-500/[0.07] sm:p-4">
+                <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-violet-300">
+                  <Users size={21} />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-slate-100">
+                    Secure user accounts
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                    A protected authentication experience.
+                  </p>
+                </div>
+
+                <ArrowRight
+                  size={17}
+                  className="text-slate-500 transition group-hover:translate-x-1 group-hover:text-violet-300"
+                />
+              </div>
+
+              <div className="group flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.035] p-3.5 transition hover:border-cyan-400/30 hover:bg-cyan-500/5 sm:p-4">
+                <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-cyan-400/10 text-cyan-300">
+                  <LockKeyhole size={21} />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-slate-100">
+                    Session management
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                    Manage access to protected resources.
+                  </p>
+                </div>
+
+                <ArrowRight
+                  size={17}
+                  className="text-slate-500 transition group-hover:translate-x-1 group-hover:text-cyan-300"
+                />
+              </div>
+
+              {/* Highlight row */}
+              <div className="relative overflow-hidden rounded-2xl border border-violet-300/30 bg-linear-to-r from-violet-600 via-indigo-500 to-lime-300 p-px shadow-[0_8px_30px_rgba(124,58,237,0.15)]">
+                <div className="flex items-center gap-3 rounded-[15px] bg-[#17152d]/95 p-3.5 sm:p-4">
+                  <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-violet-400/15 text-violet-200">
+                    <CheckCircle2 size={22} />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-white">
+                      Authentication secured
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      Powered by BetterAuth & Next.js
+                    </p>
+                  </div>
+
+                  <span className="size-2 shrink-0 rounded-full bg-lime-300 shadow-[0_0_12px_3px_rgba(190,242,100,0.35)]" />
+                </div>
+              </div>
+            </div>
+
+            {/* Authentication methods */}
+            <div className="mt-6 border-t border-white/10 pt-5">
+              <p className="mb-3 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-slate-500">
+                Flexible sign-in options
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <span className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs text-slate-300">
+                  <span className="size-1.5 rounded-full bg-lime-300" />
+                  Email
+                </span>
+
+                <span className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs text-slate-300">
+                  <span className="font-bold text-sm text-blue-400">G</span>
+                  Google
+                </span>
+
+                <span className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs text-slate-300">
+                  <span className="font-bold text-sm text-sky-400">G</span>
+                  GitHub
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Floating privacy badge */}
+          <div className="absolute bottom-8 right-0 z-30 animate-[float_6s_ease-in-out_infinite] rounded-2xl border border-lime-300/25 bg-[#10182a]/95 px-4 py-3 shadow-[0_10px_35px_rgba(132,204,22,0.12)] backdrop-blur-xl sm:bottom-10 sm:right-1 sm:px-5">
+            <div className="flex items-center gap-3">
+              <div className="grid size-9 place-items-center rounded-full bg-lime-300/15 text-lime-300">
+                <CheckCircle2 size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-white">
+                  Privacy first
+                </p>
+                <p className="mt-1 text-[10px] text-slate-400">
+                  Your data, your control
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Floating framework badge */}
+          <div className="absolute bottom-9 left-1 z-30 hidden items-center gap-2 rounded-xl border border-white/10 bg-[#10152b]/90 px-3 py-2.5 text-xs text-slate-300 shadow-xl backdrop-blur-xl sm:flex">
+            <Code2 size={16} className="text-cyan-300" />
+            Built for developers
           </div>
         </div>
       </section>
