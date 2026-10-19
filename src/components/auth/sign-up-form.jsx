@@ -336,7 +336,9 @@ export default function SignUpForm() {
               onPointerMove={handlePointerMove}
               className="spin-border rounded-[28px] p-px shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
             >
-              <div className="relative overflow-hidden rounded-[27px] bg-[#0a0b12]/90 p-6 backdrop-blur-2xl sm:p-9">
+              {/* <div className="relative overflow-hidden rounded-[27px] bg-[#0a0b12]/90 p-6 backdrop-blur-2xl sm:p-9"> */}
+
+              <div className="relative overflow-hidden rounded-[27px] bg-[#0a0b12] p-6 backdrop-blur-2xl sm:p-9">
                 <div className="spotlight pointer-events-none absolute inset-0" />
 
                 <div className="relative">
