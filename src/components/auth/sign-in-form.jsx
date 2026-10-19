@@ -331,7 +331,47 @@ export default function SignInForm() {
             © {new Date().getFullYear()} NextAuth Pro
           </p>
 
-          <p className="group text-xs text-slate-500">
+          <p className="flex flex-wrap items-center gap-3 text-xs text-slate-400 sm:gap-4">
+            <span>Crafted with care by</span>
+
+            <a
+              href="https://marleydip.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visit Md Sofian Hasan's portfolio (opens in a new tab)"
+              className="group relative inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-slate-900/60 py-1 pl-1 pr-2 shadow-[0_0_25px_rgba(139,92,246,0.08)] backdrop-blur-xl transition-all duration-300 hover:border-fuchsia-400/60 hover:bg-violet-500/10 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:gap-3 sm:py-1.5 sm:pl-1.5 sm:pr-3"
+            >
+              {/* Monogram */}
+              <span className="relative grid size-5 shrink-0 place-items-center rounded-full border border-violet-400/70 bg-linear-to-br from-violet-500/20 to-fuchsia-500/10 text-[7px] tracking-wide text-white shadow-[0_0_14px_rgba(139,92,246,0.2)] transition-all duration-300 group-hover:border-fuchsia-400 group-hover:shadow-[0_0_20px_rgba(217,70,239,0.3)] sm:size-6">
+                MSH
+              </span>
+
+              {/* Divider */}
+              <span
+                aria-hidden="true"
+                className="h-4 w-px bg-linear-to-b from-transparent via-violet-400/50 to-transparent"
+              />
+
+              {/* Name */}
+              <span className="bg-linear-to-r from-violet-300 via-fuchsia-400 to-violet-300 bg-clip-text text-[10px] font-semibold text-transparent transition-all duration-300 group-hover:from-fuchsia-300 group-hover:via-violet-300 group-hover:to-fuchsia-300 sm:text-xs">
+                Md Sofian Hasan
+              </span>
+
+              {/* External link icon */}
+              {/* <MoveUpRight
+                strokeWidth={1.8}
+                className="size-3 shrink-0 text-fuchsia-400 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 sm:size-4"
+              /> */}
+
+              {/* Gradient underline */}
+              <span
+                aria-hidden="true"
+                className="absolute -bottom-1 left-[18%] h-px w-0 rounded-full bg-linear-to-r from-violet-500 to-fuchsia-400 shadow-[0_0_10px_rgba(217,70,239,0.5)] transition-all duration-500 group-hover:w-[64%]"
+              />
+            </a>
+          </p>
+
+          {/* <p className="group text-xs text-slate-500">
             Develop with passion by{" "}
             <a
               href="https://marleydip.netlify.app/"
@@ -360,7 +400,7 @@ export default function SignInForm() {
 
               <span className="absolute -bottom-1 left-0 h-px w-0 bg-linear-to-r from-violet-400 to-fuchsia-400 transition-all duration-300 group-hover:w-full" />
             </a>
-          </p>
+          </p> */}
         </div>
       </aside>
 

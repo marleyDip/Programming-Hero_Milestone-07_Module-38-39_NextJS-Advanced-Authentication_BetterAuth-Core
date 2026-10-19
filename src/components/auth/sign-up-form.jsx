@@ -734,7 +734,6 @@ export default function SignUpForm() {
         <div className="flex justify-end">
           <Brand />
         </div>
-
         <div className="ml-auto w-full max-w-xl py-10">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 backdrop-blur-xl">
             <Sparkles size={15} className="text-lime-300" />
@@ -783,7 +782,7 @@ export default function SignUpForm() {
         </div>
 
         <p className="text-right text-xs text-slate-500">
-          © {new Date().getFullYear()} NextAuth Pro · Crafted by{" "}
+          © {new Date().getFullYear()} NextAuth Pro · Develop with passion by{" "}
           <a
             href="https://marleydip.netlify.app/"
             target="_blank"
