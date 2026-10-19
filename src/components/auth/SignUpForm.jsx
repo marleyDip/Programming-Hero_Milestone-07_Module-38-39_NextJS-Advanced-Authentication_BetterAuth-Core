@@ -26,12 +26,13 @@ import {
   Zap,
 } from "lucide-react";
 
-import { authClient } from "@/lib/auth-client";
+// import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { useEffect, useState } from "react";
+import { signUp } from "@/lib/auth-client";
 
 const inputClass =
   "rounded-xl border border-white/15 bg-white/4 text-white shadow-sm transition focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-500/20";
@@ -81,7 +82,7 @@ export default function SignUpPage() {
     const toastId = toast.loading("Creating your account...");
 
     try {
-      const { data: resData, error } = await authClient.signUp.email({
+      const { data: resData, error } = await signUp.email({
         name: data.name,
         email: data.email,
         password: data.password,
@@ -178,7 +179,8 @@ export default function SignUpPage() {
     });
 
     try {
-      const { error } = await authClient.signIn.social({
+      // const { error } = await authClient.signUp.social({
+      const { error } = await signUp.social({
         provider,
         callbackURL: "/",
       });

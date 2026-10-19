@@ -8,6 +8,8 @@ import {
 import { Toaster } from "sonner";
 
 import SplashScreen from "@/components/splash-screen";
+import { siteConfig } from "@/lib/site";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -24,6 +26,50 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: `${siteConfig.name} | ${siteConfig.tagline}`,
+    template: `%s | ${siteConfig.name}`,
+  },
+
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  keywords: siteConfig.keywords,
+  authors: [{ name: "Md Sofian Hasan", url: "https://marleydip.netlify.app/" }],
+  creator: "Md Sofian Hasan",
+  alternates: { canonical: "/" },
+
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: siteConfig.name,
+    title: `${siteConfig.name} | ${siteConfig.tagline}`,
+    description: siteConfig.description,
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteConfig.name} | ${siteConfig.tagline}`,
+    description: siteConfig.description,
+    creator: siteConfig.twitter,
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+};
+
+export const viewport = {
+  themeColor: "#05060a",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+};
+
+/* export const metadata = {
   metadataBase: new URL("https://your-domain.com"),
 
   title: {
@@ -69,7 +115,7 @@ export const metadata = {
     index: true,
     follow: true,
   },
-};
+}; */
 
 export default function RootLayout({ children }) {
   return (

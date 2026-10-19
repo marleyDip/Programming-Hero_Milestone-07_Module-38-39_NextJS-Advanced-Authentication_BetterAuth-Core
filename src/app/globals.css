@@ -2,6 +2,87 @@
 
 @import "@heroui/styles";
 
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes spin-angle {
+  to {
+    --angle: 360deg;
+  }
+}
+
+@keyframes drift-1 {
+  50% {
+    transform: translate(8vmax, 6vmax) scale(1.1);
+  }
+}
+
+@keyframes drift-2 {
+  50% {
+    transform: translate(-7vmax, 8vmax) scale(1.15);
+  }
+}
+
+@keyframes drift-3 {
+  50% {
+    transform: translate(6vmax, -7vmax) scale(1.1);
+  }
+}
+
+@keyframes float-y {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.spin-border {
+  background: conic-gradient(
+    from var(--angle),
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.06) 45%,
+    #8b5cf6 62%,
+    #22d3ee 76%,
+    #bef264 90%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  animation: spin-angle 7s linear infinite;
+}
+
+.spotlight {
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(190, 242, 100, 0.09),
+    rgba(139, 92, 246, 0.07) 40%,
+    transparent 70%
+  );
+}
+
+.aurora-1 {
+  animation: drift-1 22s ease-in-out infinite;
+}
+.aurora-2 {
+  animation: drift-2 26s ease-in-out infinite;
+}
+.aurora-3 {
+  animation: drift-3 30s ease-in-out infinite;
+}
+.float-a {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin-border,
+  .aurora-1,
+  .aurora-2,
+  .aurora-3,
+  .float-a {
+    animation: none;
+  }
+}
+
 @keyframes float {
   0%,
   100% {

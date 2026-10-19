@@ -1,9 +1,11 @@
-import SignUpForm from "@/components/auth/SignUpForm";
+import SignUpForm from "@/components/auth/sign-up-form";
 
 export const metadata = {
   title: "Create Account",
   description:
-    "Create your NextAuth Pro account with secure authentication powered by BetterAuth. Sign up using email, Google, or GitHub.",
+    "Create your account in seconds with email, Google or GitHub. Create your NextAuth Pro account with secure authentication powered by BetterAuth. Sign up using email, Google, or GitHub.",
+
+  alternates: { canonical: "/sign-up" },
 
   robots: {
     index: false,
