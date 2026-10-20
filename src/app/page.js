@@ -9,6 +9,9 @@ import {
   Zap,
 } from "lucide-react";
 
+import UserMenu from "@/components/profile/user-menu-client";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 const features = [
@@ -41,7 +44,27 @@ const features = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  // console.log("Read the session on the server", session);
+
+  // Send only plain, serializable fields to the client component
+  const user = session?.user
+    ? {
+        name: session.user.name,
+        email: session.user.email,
+        image: session.user.image ?? null,
+        emailVerified: Boolean(session.user.emailVerified),
+        createdAt: session.user.createdAt
+          ? new Date(session.user.createdAt).toISOString()
+          : null,
+      }
+    : null;
+
+  // if (!session?.user) return null;
+  // const { id, name, email, image, emailVerified } = session.user;
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#080b19] text-white">
       {/* Background glow */}
@@ -51,8 +74,8 @@ export default function HomePage() {
 
       <div className="pointer-events-none absolute bottom-0 right-0 size-80 rounded-full bg-lime-400/10 blur-[130px]" />
 
-      {/* Navbar */}
-      <header className="relative z-10 border-b border-white/10">
+      {/* Navbar: make the header z-30 so the dropdown isn't clipped */}
+      <header className="relative z-30 border-b border-white/10">
         <nav className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-5 sm:px-5 sm:gap-4 md:px-8">
           {/* Logo */}
           <Link href="/" className="flex shrink-0 items-center gap-2 sm:gap-3">
@@ -96,7 +119,7 @@ export default function HomePage() {
           </div>
 
           {/* Authentication Button */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/sign-in"
               className="rounded-xl border border-violet-400/40 px-4 py-2.5 text-sm font-medium transition hover:bg-violet-500/10 sm:px-6"
@@ -110,7 +133,13 @@ export default function HomePage() {
             >
               Sign Up
             </Link>
-          </div>
+          </div> */}
+
+          {/* Authentication / Profile - client session  */}
+          {/* <UserMenu /> */}
+
+          {/* Authentication / Profile - server session  */}
+          <UserMenu user={user} />
         </nav>
       </header>
 
@@ -581,6 +610,23 @@ export default function HomePage() {
     </main>
   );
 }
+
+/* 
+{user ? (
+  <Link
+    href="/profile"
+    className="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-xl border border-white/15 bg-linear-to-r from-violet-600 via-indigo-500 to-lime-300 px-7 py-3.5 font-semibold text-white shadow-[6px_6px_14px_rgba(5,8,25,0.45)] transition-all duration-300 hover:-translate-y-1 hover:brightness-110"
+  >
+    Go to Profile
+    <ArrowRight
+      size={18}
+      className="transition-transform group-hover:translate-x-1"
+    />
+  </Link>
+) : (
+  <>your existing Get Started and Sign In links </>
+)} 
+*/
 
 /* <p className="mt-7 max-w-xl text-base leading-8 text-slate-300 sm:text-lg">
   A modern authentication solution for your Next.js applications.

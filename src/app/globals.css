@@ -2,6 +2,70 @@
 
 @import "@heroui/styles";
 
+/* Profile */
+@property --um-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes um-spin {
+  to {
+    --um-angle: 360deg;
+  }
+}
+
+@keyframes um-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.um-ring {
+  background: conic-gradient(
+    from var(--um-angle),
+    #8b5cf6,
+    #22d3ee,
+    #bef264,
+    #8b5cf6
+  );
+  animation: um-spin 6s linear infinite;
+}
+
+.um-border {
+  background: conic-gradient(
+    from var(--um-angle),
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    #8b5cf6 68%,
+    #22d3ee 82%,
+    #bef264 94%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  animation: um-spin 8s linear infinite;
+}
+
+[aria-expanded="true"] + .um-border .um-item {
+  animation: um-item-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i) * 70ms + 120ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .um-ring,
+  .um-border {
+    animation: none;
+  }
+  [aria-expanded="true"] + .um-border .um-item {
+    animation: none;
+  }
+}
+
+/* Sign In & Sign Up */
 @property --angle {
   syntax: "<angle>";
   inherits: false;
