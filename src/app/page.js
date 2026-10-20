@@ -611,6 +611,15 @@ export default async function HomePage() {
   );
 }
 
+/* const session = await auth.api.getSession({ headers: await headers() });
+
+  • How it works: This imports your main server configuration instance (auth). It calls the internal API function directly inside Node.js.
+  
+  • Why the headers? Next.js Server Components don't automatically expose incoming request headers or cookies to deep sub-functions. You must manually pass await headers() from next/headers so Better Auth can parse the session token stored in the user's cookies.
+  
+  • Best used in: Next.js Server Components, Server Actions, or Route Handlers.
+*/
+
 /* 
 {user ? (
   <Link
