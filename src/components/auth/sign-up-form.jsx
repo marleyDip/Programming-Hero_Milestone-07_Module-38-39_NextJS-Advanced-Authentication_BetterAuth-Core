@@ -23,6 +23,7 @@ import {
   RotateCcw,
   ShieldCheck,
   Sparkles,
+  SquareArrowOutUpRight,
   UserPlus,
   UserRound,
 } from "lucide-react";
@@ -727,6 +728,55 @@ export default function SignUpForm() {
           </Link>
           .
         </footer>
+
+        {/* Developer */}
+        <div className="flex items-center justify-center pb-6 lg:hidden">
+          <p className="group relative flex flex-wrap items-center text-xs sm:text-sm">
+            {/* Glass credit pill */}
+            <span className="relative inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-violet-500/30 bg-slate-900/60 px-2 py-3 shadow-[0_0_25px_rgba(139,92,246,0.08)] backdrop-blur-xl transition-all duration-300 hover:border-lime-400/40 hover:shadow-[0_0_30px_rgba(139,92,246,0.12)] sm:px-3">
+              {/* Copyright and project name */}
+              <span className="text-slate-400">
+                © {new Date().getFullYear()} NextAuth Pro
+              </span>
+
+              {/* <span
+                aria-hidden="true"
+                className="inline-block h-1 w-1 rounded-full bg-slate-600"
+              /> */}
+
+              <span
+                aria-hidden="true"
+                className="inline-block h-1.5 w-1.5 rounded-full bg-linear-to-br from-slate-400 via-slate-600 to-slate-800 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.3)] ring-1 ring-slate-950/10"
+              />
+
+              {/*  <span
+                aria-hidden="true"
+                className="inline-block h-1.5 w-1.5 rounded-full bg-slate-900 dark:bg-slate-50 ring-4 ring-slate-500/10 dark:ring-slate-400/10 transition-all duration-300"
+              /> */}
+
+              <span className="text-slate-400">Programmed by</span>
+
+              {/* Portfolio link */}
+              <a
+                href="https://marleydip.netlify.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit Md Sofian Hasan's portfolio (opens in a new tab)"
+                className="group/link inline-flex items-center gap-1.5 rounded-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-400"
+              >
+                <span className="bg-linear-to-r from-violet-400 via-purple-300 to-lime-300 bg-clip-text text-transparent transition-all duration-300 group-hover/link:from-lime-300 group-hover/link:via-violet-300 group-hover/link:to-fuchsia-400">
+                  Md Sofian Hasan
+                </span>
+
+                {/* External link icon */}
+                <SquareArrowOutUpRight
+                  strokeWidth={1.8}
+                  className="size-3 shrink-0 text-lime-300 transition-transform duration-300 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 sm:size-4"
+                />
+              </a>
+            </span>
+          </p>
+        </div>
       </section>
 
       {/* ============ RIGHT: brand panel ============ */}
@@ -734,6 +784,7 @@ export default function SignUpForm() {
         <div className="flex justify-end">
           <Brand />
         </div>
+
         <div className="ml-auto w-full max-w-xl py-10">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 backdrop-blur-xl">
             <Sparkles size={15} className="text-lime-300" />
@@ -781,7 +832,89 @@ export default function SignUpForm() {
           </div>
         </div>
 
-        <p className="text-right text-xs text-slate-500">
+        {/* Developer */}
+        <div className="hidden lg:flex justify-end">
+          <p className="group relative flex flex-wrap items-center gap-2 text-xs sm:gap-3 xl:text-sm">
+            {/* Decorative gradient line */}
+            <span
+              aria-hidden="true"
+              className="hidden h-px w-12 bg-linear-to-r from-violet-500 via-lime-300 to-transparent xl:block sm:w-20"
+            />
+
+            {/* Sparkle */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="url(#footer-sparkle)"
+              aria-hidden="true"
+              className="size-5 shrink-0 text-violet-400 transition-transform duration-500 group-hover:rotate-45 xl:size-7"
+            >
+              <defs>
+                <linearGradient id="footer-sparkle" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#a78bfa" />
+                  <stop offset="100%" stopColor="#a3e635" />
+                </linearGradient>
+              </defs>
+
+              <path d="M12 0 15.2 8.8 24 12l-8.8 3.2L12 24l-3.2-8.8L0 12l8.8-3.2L12 0Z" />
+            </svg>
+
+            {/* Glass credit pill */}
+            <span className="relative inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-violet-500/30 bg-slate-900/60 px-3 py-3 shadow-[0_0_25px_rgba(139,92,246,0.08)] backdrop-blur-xl transition-all duration-300 hover:border-lime-400/40 hover:shadow-[0_0_30px_rgba(139,92,246,0.12)] xl:gap-x-3 xl:px-5 xl:py-3">
+              {/* Copyright and project name */}
+              <span className="text-slate-400">
+                © {new Date().getFullYear()} NextAuth Pro
+              </span>
+
+              {/* Dot */}
+              <span
+                className="relative flex h-2 w-2 items-center justify-center"
+                aria-hidden="true"
+              >
+                {/* Outer ambient glow ring */}
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-45" />
+                {/* Soft static ring */}
+                <span className="absolute inline-flex h-full w-full rounded-full bg-indigo-500/20" />
+                {/* Ultra-sharp premium inner core */}
+                <span className="relative inline-block h-1 w-1 rounded-full bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.6)]" />
+              </span>
+
+              <span className="text-slate-400">Develop with passion by</span>
+
+              {/* Portfolio link */}
+              <a
+                href="https://marleydip.netlify.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit Md Sofian Hasan's portfolio (opens in a new tab)"
+                className="group/link inline-flex items-center gap-1.5 rounded-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-400"
+              >
+                <span className="bg-linear-to-r from-violet-400 via-purple-300 to-lime-300 bg-clip-text text-transparent transition-all duration-300 group-hover/link:from-lime-300 group-hover/link:via-violet-300 group-hover/link:to-fuchsia-400">
+                  Md Sofian Hasan
+                </span>
+
+                {/* External link icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-lime-300 transition-transform duration-300 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 xl:size-5"
+                >
+                  <path d="M14 4h6v6" />
+                  <path d="M20 4 10 14" />
+                  <path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6" />
+                </svg>
+              </a>
+            </span>
+          </p>
+        </div>
+
+        {/* <p className="text-right text-xs text-slate-500">
           © {new Date().getFullYear()} NextAuth Pro · Develop with passion by{" "}
           <a
             href="https://marleydip.netlify.app/"
@@ -791,7 +924,7 @@ export default function SignUpForm() {
           >
             Md Sofian Hasan
           </a>
-        </p>
+        </p> */}
       </aside>
 
       {/* <style>{`
