@@ -18,7 +18,8 @@ export default async function ProfilePage() {
   const session = await auth.api.getSession({ headers: h });
 
   // Real validation (the proxy only checks the cookie exists)
-  if (!session) redirect("/sign-in");
+  // if (!session) redirect("/sign-in");
+  if (!session) redirect("/sign-in?reason=login-required&callbackURL=/profile");
 
   // Which sign-in methods this account has (credential = email + password)
   let providers = ["credential"];

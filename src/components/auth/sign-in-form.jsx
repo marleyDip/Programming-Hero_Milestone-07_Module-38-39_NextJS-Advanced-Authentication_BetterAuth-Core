@@ -110,7 +110,7 @@ function Brand() {
   );
 }
 
-export default function SignInForm() {
+export default function SignInForm({ reason, callbackURL = "/" }) {
   const router = useRouter();
   const cardRef = useRef(null);
 
@@ -125,6 +125,16 @@ export default function SignInForm() {
     window.addEventListener("pageshow", reset);
     return () => window.removeEventListener("pageshow", reset);
   }, []);
+
+  // Message when the user was bounced from a protected route
+  useEffect(() => {
+    if (reason === "login-required") {
+      toast.warning("Sign in required", {
+        id: "auth-required", // fixed id stops duplicates in React Strict Mode
+        description: "Please sign in to access that page.",
+      });
+    }
+  }, [reason]);
 
   // Cursor spotlight: writes CSS variables, no React state involved
   const handlePointerMove = (e) => {
@@ -177,7 +187,8 @@ export default function SignInForm() {
         description: "Redirecting you now home page...",
       });
 
-      router.push("/");
+      // router.push("/");
+      router.push(callbackURL);
       router.refresh();
     } catch {
       toast.error("Something went wrong", {
@@ -204,7 +215,8 @@ export default function SignInForm() {
 
       const { error } = await signIn.social({
         provider,
-        callbackURL: "/",
+        callbackURL,
+        // callbackURL: "/",
       });
 
       if (error) {
@@ -428,7 +440,7 @@ export default function SignInForm() {
 
         <div className="flex flex-1 items-center justify-center px-5 py-6">
           <div className="w-full max-w-110">
-            {/* Card with animated gradient border + spotlight */}
+            {/* Card with animated gradient border & spotlight */}
             <div
               ref={cardRef}
               onPointerMove={handlePointerMove}
@@ -438,6 +450,26 @@ export default function SignInForm() {
                 <div className="spotlight pointer-events-none absolute inset-0" />
 
                 <div className="relative">
+                  {reason === "login-required" && (
+                    <div
+                      role="alert"
+                      className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-400/25 bg-amber-400/10 p-4 text-sm"
+                    >
+                      <LockKeyhole
+                        size={18}
+                        className="mt-0.5 shrink-0 text-amber-300"
+                      />
+                      <div>
+                        <p className="font-semibold text-amber-100">
+                          Sign in required
+                        </p>
+                        <p className="mt-0.5 text-amber-200/70">
+                          You need to be signed in to view that page.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Heading */}
                   <div className="mb-7 text-center">
                     <div className="mx-auto mb-5 grid size-14 place-items-center rounded-2xl border border-white/10 bg-linear-to-br from-lime-300/20 to-violet-500/20 text-lime-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">

@@ -4,7 +4,9 @@ import { NextResponse } from "next/server";
 const protectedRoutes = ["/profile", "/dashboard"];
 
 export function proxy(request) {
-  const { pathname } = request.nextUrl;
+  // const { pathname } = request.nextUrl;
+
+  const { pathname, search } = request.nextUrl;
   const sessionCookie = getSessionCookie(request);
 
   const isProtected = protectedRoutes.some(
@@ -12,8 +14,17 @@ export function proxy(request) {
   );
 
   // Optimistic check: only looks for the cookie, it doesn't validate it
-  if (isProtected && !sessionCookie) {
+  /* if (isProtected && !sessionCookie) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
+  } */
+
+  if (isProtected && !sessionCookie) {
+    const signInUrl = new URL("/sign-in", request.url);
+
+    signInUrl.searchParams.set("reason", "login-required");
+    signInUrl.searchParams.set("callbackURL", pathname + search);
+
+    return NextResponse.redirect(signInUrl);
   }
 
   return NextResponse.next();
