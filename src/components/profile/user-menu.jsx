@@ -1,6 +1,7 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import { signOut, useSession } from "@/lib/auth-client";
+// import { authClient } from "@/lib/auth-client";
 
 // import { Spinner } from "@heroui/react";
 import {
@@ -49,7 +50,8 @@ export default function UserMenu() {
   const router = useRouter();
 
   // It is a React Hook that establishes a reactive, stateful connection to the user's login status.
-  const { data: session, isPending, error } = authClient.useSession();
+  // const { data: session, isPending, error } = authClient.useSession();
+  const { data: session, isPending, error } = useSession();
 
   // console.log("The session loads on the client", session);
 
@@ -90,7 +92,9 @@ export default function UserMenu() {
     const toastId = toast.loading("Signing you out...");
 
     try {
-      const { error } = await authClient.signOut();
+      // const { error } = await authClient.signOut();
+
+      const { error } = await signOut();
 
       if (error) {
         toast.error("Sign out failed", {

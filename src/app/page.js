@@ -66,7 +66,7 @@ export default async function HomePage() {
   // const { id, name, email, image, emailVerified } = session.user;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#080b19] text-white">
+    <main className="relative min-h-screen overflow-x-clip bg-[#080b19] text-white">
       {/* Background glow */}
       <div className="pointer-events-none absolute -left-48 -top-40 size-125 rounded-full bg-violet-600/20 blur-[150px]" />
 
@@ -75,7 +75,10 @@ export default async function HomePage() {
       <div className="pointer-events-none absolute bottom-0 right-0 size-80 rounded-full bg-lime-400/10 blur-[130px]" />
 
       {/* Navbar: make the header z-30 so the dropdown isn't clipped */}
-      <header className="relative z-30 border-b border-white/10">
+      {/* <header className="relative z-30 border-b border-white/10"> */}
+      <header className="sticky top-0 z-40 border-b border-white/8 bg-[#080b19]/75 shadow-[0_8px_32px_rgba(0,0,0,0.2)] backdrop-blur-2xl supports-backdrop-filter:bg-[#080b19]/65">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-violet-500/40 to-transparent" />
+
         <nav className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-5 sm:px-5 sm:gap-4 md:px-8">
           {/* Logo */}
           <Link href="/" className="flex shrink-0 items-center gap-2 sm:gap-3">
@@ -94,8 +97,132 @@ export default async function HomePage() {
             </div>
           </Link>
 
+          {/* Animated Navigation */}
+          <div className="group/nav relative hidden items-center gap-1 rounded-full border border-white/10 bg-slate-950/60 p-1.5 shadow-[0_0_25px_rgba(139,92,246,0.06)] backdrop-blur-2xl md:flex">
+            {/* Animated gradient border glow */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-px -z-10 rounded-full bg-linear-to-r from-violet-500/0 via-fuchsia-400/30 to-lime-300/0 opacity-0 blur-md transition-opacity duration-500 group-hover/nav:opacity-100"
+            />
+
+            {/* Home */}
+            <a
+              href="#home"
+              className="group/link relative isolate overflow-hidden rounded-full px-5 py-2.5 text-sm font-medium text-slate-400 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/6 hover:text-white hover:shadow-[0_4px_20px_rgba(139,92,246,0.12)]"
+            >
+              <span className="absolute inset-0 -z-10 origin-left scale-x-0 rounded-full bg-linear-to-r from-violet-500/20 to-fuchsia-500/10 transition-transform duration-300 ease-out group-hover/link:scale-x-100" />
+
+              <span className="relative">Home</span>
+
+              <span className="absolute inset-x-5 bottom-1 h-px origin-center scale-x-0 bg-linear-to-r from-violet-400 to-fuchsia-400 transition-transform duration-300 group-hover/link:scale-x-100" />
+            </a>
+
+            {/* Features */}
+            <a
+              href="#features"
+              className="group/link relative isolate overflow-hidden rounded-full px-5 py-2.5 text-sm font-medium text-slate-400 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/6 hover:text-white hover:shadow-[0_4px_20px_rgba(139,92,246,0.12)]"
+            >
+              <span className="absolute inset-0 -z-10 origin-left scale-x-0 rounded-full bg-linear-to-r from-violet-500/20 to-fuchsia-500/10 transition-transform duration-300 ease-out group-hover/link:scale-x-100" />
+
+              <span className="relative">Features</span>
+
+              <span className="absolute inset-x-5 bottom-1 h-px origin-center scale-x-0 bg-linear-to-r from-violet-400 to-fuchsia-400 transition-transform duration-300 group-hover/link:scale-x-100" />
+            </a>
+
+            {/* Docs */}
+            <a
+              href="https://www.better-auth.com/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group/link relative inline-flex items-center gap-1.5 overflow-hidden rounded-full px-5 py-2.5 text-sm font-medium text-slate-400 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/6 hover:text-white hover:shadow-[0_4px_20px_rgba(139,92,246,0.12)]"
+            >
+              <span className="absolute inset-0 -z-10 origin-left scale-x-0 rounded-full bg-linear-to-r from-violet-500/20 to-fuchsia-500/10 transition-transform duration-300 ease-out group-hover/link:scale-x-100" />
+
+              <span>Docs</span>
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="size-3.5 text-slate-500 transition-all duration-300 group-hover/link:-translate-y-1 group-hover/link:translate-x-1 group-hover/link:text-violet-300"
+              >
+                <path d="M7 17 17 7" />
+                <path d="M7 7h10v10" />
+              </svg>
+
+              <span className="absolute inset-x-5 bottom-1 h-px origin-center scale-x-0 bg-linear-to-r from-violet-400 to-fuchsia-400 transition-transform duration-300 group-hover/link:scale-x-100" />
+            </a>
+
+            {/* About */}
+            <a
+              href="#about"
+              className="group/link relative isolate overflow-hidden rounded-full px-5 py-2.5 text-sm font-medium text-slate-400 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/6 hover:text-white hover:shadow-[0_4px_20px_rgba(139,92,246,0.12)]"
+            >
+              <span className="absolute inset-0 -z-10 origin-left scale-x-0 rounded-full bg-linear-to-r from-violet-500/20 to-fuchsia-500/10 transition-transform duration-300 ease-out group-hover/link:scale-x-100" />
+
+              <span className="relative">About</span>
+
+              <span className="absolute inset-x-5 bottom-1 h-px origin-center scale-x-0 bg-linear-to-r from-violet-400 to-fuchsia-400 transition-transform duration-300 group-hover/link:scale-x-100" />
+            </a>
+          </div>
+
+          {/* Navigation Links */}
+          {/* <div className="hidden items-center gap-1 rounded-full border border-white/8 bg-white/3 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl md:flex">
+            <a
+              href="#home"
+              className="group relative rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/6 hover:text-white"
+            >
+              Home
+              <span className="absolute inset-x-4 bottom-1 h-px origin-center scale-x-0 rounded-full bg-linear-to-r from-violet-400 to-fuchsia-400 transition-transform duration-300 group-hover:scale-x-100" />
+            </a>
+
+            <a
+              href="#features"
+              className="group relative rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/6 hover:text-white"
+            >
+              Features
+              <span className="absolute inset-x-4 bottom-1 h-px origin-center scale-x-0 rounded-full bg-linear-to-r from-violet-400 to-fuchsia-400 transition-transform duration-300 group-hover:scale-x-100" />
+            </a>
+
+            <a
+              href="https://www.better-auth.com/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/6 hover:text-white"
+            >
+              Docs
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="size-3.5 text-slate-500 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-violet-300"
+              >
+                <path d="M7 17 17 7" />
+                <path d="M7 7h10v10" />
+              </svg>
+            </a>
+
+            <a
+              href="#about"
+              className="group relative rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/6 hover:text-white"
+            >
+              About
+              <span className="absolute inset-x-4 bottom-1 h-px origin-center scale-x-0 rounded-full bg-linear-to-r from-violet-400 to-fuchsia-400 transition-transform duration-300 group-hover:scale-x-100" />
+            </a>
+          </div> */}
+
           {/* Nav href */}
-          <div className="hidden items-center gap-8 text-sm text-slate-300 md:flex">
+          {/* <div className="hidden items-center gap-8 text-sm text-slate-300 md:flex">
             <a href="#home" className="transition hover:text-violet-300">
               Home
             </a>
@@ -116,7 +243,7 @@ export default async function HomePage() {
             <a href="#about" className="transition hover:text-violet-300">
               About
             </a>
-          </div>
+          </div> */}
 
           {/* Authentication Button */}
           {/* <div className="flex items-center gap-2 sm:gap-3">
