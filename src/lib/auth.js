@@ -10,6 +10,33 @@ export const auth = betterAuth({
     enabled: true,
   },
 
+  socialProviders: {
+    google: {
+      clientId: process.env.BETTER_AUTH_GOOGLE_CLIENT_ID,
+      clientSecret: process.env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
+    },
+
+    github: {
+      clientId: process.env.BETTER_AUTH_GITHUB_CLIENT_ID,
+      clientSecret: process.env.BETTER_AUTH_GITHUB_CLIENT_SECRET,
+    },
+  },
+
+  user: {
+    changeEmail: {
+      enabled: true,
+      // Called when a verified user asks to change email. Send the link to the user.
+      // The callback name differs between Better Auth versions, so check the
+      // "Change Email" section of the docs for yours.
+      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+        // await sendEmail({ to: user.email, subject: "Confirm your new email", ... })
+      },
+
+      // Updating email immediately without verification
+      // updateEmailWithoutVerification: true,
+    },
+  },
+
   database: mongodbAdapter(db, {
     client,
   }),
