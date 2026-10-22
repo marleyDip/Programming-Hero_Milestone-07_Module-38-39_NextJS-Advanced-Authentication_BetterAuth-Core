@@ -5,7 +5,17 @@ export const authClient = createAuthClient({
   baseURL: process.env.BETTER_AUTH_URL,
 });
 
-export const { signIn, signUp, signOut, useSession } = createAuthClient();
+export const {
+  signIn,
+  signUp,
+  signOut,
+  updateUser,
+  changeEmail,
+  requestPasswordReset,
+  resetPassword,
+  useSession,
+  changePassword,
+} = createAuthClient();
 
 /**
  * sign up: register : create Account: first time user

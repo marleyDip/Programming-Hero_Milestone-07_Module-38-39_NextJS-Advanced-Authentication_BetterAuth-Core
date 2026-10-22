@@ -1,6 +1,7 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+// import { authClient } from "@/lib/auth-client";
+import { changeEmail, changePassword, updateUser } from "@/lib/auth-client";
 import UserMenu from "./user-menu-client";
 
 import {
@@ -318,13 +319,22 @@ export default function ProfileView({ user, hasPassword, providers }) {
       })
     : null;
 
-  /* Shared request runner: loading toast -> success/error toast */
-  const run = async ({ key, loading, errorTitle, action, success }) => {
+  // Shared request runner: loading toast -> success/error toast
+  const run = async ({
+    key,
+    loading,
+    errorTitle,
+    action,
+    success,
+    logLabel,
+  }) => {
     setBusy(key);
     const id = toast.loading(loading);
 
     try {
-      const { error } = await action();
+      const { data, error } = await action();
+
+      // console.log(`${logLabel}:`, data);
 
       if (error) {
         toast.error(errorTitle, {
@@ -338,6 +348,8 @@ export default function ProfileView({ user, hasPassword, providers }) {
 
       return true;
     } catch {
+      // console.error(`${logLabel} error:`, error);
+
       toast.error("Something went wrong", {
         id,
         description: "Please try again in a moment.",
@@ -349,6 +361,7 @@ export default function ProfileView({ user, hasPassword, providers }) {
     }
   };
 
+  // Handle Name Function
   const handleName = async (e) => {
     e.preventDefault();
 
@@ -356,8 +369,10 @@ export default function ProfileView({ user, hasPassword, providers }) {
       key: "name",
       loading: "Saving your name...",
       errorTitle: "Update failed",
+      logLabel: "Name update",
 
-      action: () => authClient.updateUser({ name: name.trim() }),
+      // action: () => authClient.updateUser({ name: name.trim() }),
+      action: () => updateUser({ name: name.trim() }),
       success: {
         title: "Profile updated",
         description: "Your name has been saved.",
@@ -367,6 +382,7 @@ export default function ProfileView({ user, hasPassword, providers }) {
     if (ok) router.refresh();
   };
 
+  // Handle Email Function
   const handleEmail = async (e) => {
     e.preventDefault();
 
@@ -374,9 +390,11 @@ export default function ProfileView({ user, hasPassword, providers }) {
       key: "email",
       loading: "Updating your email...",
       errorTitle: "Email change failed",
+      logLabel: "Email update",
 
       action: () =>
-        authClient.changeEmail({
+        // authClient.changeEmail({
+        changeEmail({
           newEmail: newEmail.trim().toLowerCase(),
           callbackURL: "/profile",
         }),
@@ -395,11 +413,20 @@ export default function ProfileView({ user, hasPassword, providers }) {
     }
   };
 
+  // Handle Password Function
   const handlePassword = async (e) => {
     e.preventDefault();
 
+    // const formData = new FormData(e.currentTarget);
+    // const userData = Object.fromEntries(formData.entries());
+
+    // console.log("In the form data", userData);
+
     const form = e.currentTarget; // keep a reference, the event is gone after await
     const data = Object.fromEntries(new FormData(form));
+
+    // console.log("Password change response:", data);
+    // {currentPassword: '', newPassword: '', confirmPassword: '', revokeOthers: 'on'}
 
     if (data.newPassword !== data.confirmPassword) {
       toast.error("Passwords do not match", {
@@ -408,10 +435,20 @@ export default function ProfileView({ user, hasPassword, providers }) {
       return;
     }
 
+    // const currentPassword = String(data.currentPassword ?? "");
+    // const newPassword = String(data.newPassword ?? "");
+
+    // console.log("Current password exists:", !!currentPassword);
+    // console.log("New password exists:", !!newPassword);
+    // console.log("Passwords match:", currentPassword === newPassword);
+
     if (data.newPassword === data.currentPassword) {
+      // console.log("Password validation failed");
+
       toast.error("Choose a different password", {
         description: "Your new password must differ from the current one.",
       });
+
       return;
     }
 
@@ -419,13 +456,22 @@ export default function ProfileView({ user, hasPassword, providers }) {
       key: "password",
       loading: "Updating your password...",
       errorTitle: "Password change failed",
+      logLabel: "Password update",
 
       action: () =>
-        authClient.changePassword({
+        // authClient.changePassword({
+        changePassword({
           currentPassword: data.currentPassword,
           newPassword: data.newPassword,
           revokeOtherSessions: data.revokeOthers === "on",
         }),
+
+      /* const { data, error } = await authClient.changePassword({
+            newPassword: "newpassword1234", // required, The new password to set
+            currentPassword: "oldpassword1234", // required, The current user password
+            revokeOtherSessions: true, // When set to true, all other active sessions for this user will be invalidated
+        });
+      */
 
       success: {
         title: "Password updated",
@@ -587,6 +633,7 @@ export default function ProfileView({ user, hasPassword, providers }) {
             >
               {tabs.map(({ id, label, hint, icon: Icon }) => {
                 const active = tab === id;
+
                 return (
                   <button
                     key={id}
