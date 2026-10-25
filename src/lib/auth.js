@@ -22,7 +22,7 @@ export const auth = betterAuth({
   appName: "NextAuth Pro",
   baseURL: process.env.BETTER_AUTH_URL,
   secret: process.env.BETTER_AUTH_SECRET,
-  // trustedOrigins: ["http://localhost:3000"],
+  // trustedOrigins: ["http://localhost:3000", "https://sofian-advanced-betterauth.vercel.app"],
 
   database: mongodbAdapter(db, { client }),
 

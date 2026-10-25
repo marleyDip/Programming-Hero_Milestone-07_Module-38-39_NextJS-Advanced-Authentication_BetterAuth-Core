@@ -36,6 +36,7 @@ import {
   UserRound,
 } from "lucide-react";
 
+import { emailTakenByAnotherUser } from "@/app/actions/check-email";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -424,6 +425,33 @@ export default function ProfileView({ user, hasPassword, providers }) {
     e.preventDefault();
 
     const requested = newEmail.trim().toLowerCase();
+
+    /* if (await emailTakenByAnotherUser(requested)) {
+      toast.error("Email already in use", {
+        description:
+          "Another account already uses this email address. Try a different one.",
+      });
+      return;
+    } */
+
+    // Block the request early if another account already uses this email
+    setBusy("email");
+    try {
+      if (await emailTakenByAnotherUser(requested)) {
+        toast.error("Email already in use", {
+          description:
+            "Another account already uses this email address. Try a different one.",
+        });
+        return;
+      }
+    } catch {
+      toast.error("Couldn't check that email", {
+        description: "Please try again in a moment.",
+      });
+      return;
+    } finally {
+      setBusy("");
+    }
 
     const ok = await run({
       key: "email",
