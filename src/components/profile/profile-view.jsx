@@ -1,7 +1,12 @@
 "use client";
 
 // import { authClient } from "@/lib/auth-client";
-import { changeEmail, changePassword, updateUser } from "@/lib/auth-client";
+import {
+  changeEmail,
+  changePassword,
+  sendVerificationEmail,
+  updateUser,
+} from "@/lib/auth-client";
 import UserMenu from "./user-menu-client";
 
 import {
@@ -23,6 +28,8 @@ import {
   LoaderCircle,
   LockKeyhole,
   Mail,
+  MailWarning,
+  RefreshCw,
   Save,
   ShieldCheck,
   Sparkles,
@@ -31,13 +38,14 @@ import {
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const inputClass =
   "h-12 w-full rounded-2xl border border-white/10 bg-white/4 pl-11 text-white placeholder:text-slate-500 transition focus-within:border-lime-300/60 focus-within:bg-white/6 focus-within:ring-4 focus-within:ring-lime-300/10";
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const RESEND_COOLDOWN = 60;
 
 const providerNames = {
   credential: "Email & password",
@@ -206,7 +214,9 @@ function Panel({ icon: Icon, title, description, children }) {
 
         <div>
           <h2 className="text-xl font-bold tracking-tight">{title}</h2>
-          <p className="mt-1 text-sm text-slate-400">{description}</p>
+          <p className="mt-1 text-xs text-slate-400 md:text-sm">
+            {description}
+          </p>
         </div>
       </div>
 
@@ -266,6 +276,7 @@ function CompletenessRing({ value }) {
 export default function ProfileView({ user, hasPassword, providers }) {
   const router = useRouter();
 
+  const [cooldown, setCooldown] = useState(0);
   const [tab, setTab] = useState("account");
   const [busy, setBusy] = useState(""); // "name" | "email" | "password"
 
@@ -319,6 +330,12 @@ export default function ProfileView({ user, hasPassword, providers }) {
       })
     : null;
 
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [cooldown]);
+
   // Shared request runner: loading toast -> success/error toast
   const run = async ({
     key,
@@ -361,6 +378,26 @@ export default function ProfileView({ user, hasPassword, providers }) {
     }
   };
 
+  const handleResend = async () => {
+    const ok = await run({
+      key: "resend",
+      loading: "Sending verification email...",
+      errorTitle: "Couldn't send the email",
+      action: () =>
+        sendVerificationEmail({
+          email: user.email,
+          callbackURL: "/profile",
+        }),
+
+      success: {
+        title: "Verification email sent",
+        description: `Check ${user.email}, including your spam folder.`,
+      },
+    });
+
+    if (ok) setCooldown(RESEND_COOLDOWN);
+  };
+
   // Handle Name Function
   const handleName = async (e) => {
     e.preventDefault();
@@ -386,6 +423,8 @@ export default function ProfileView({ user, hasPassword, providers }) {
   const handleEmail = async (e) => {
     e.preventDefault();
 
+    const requested = newEmail.trim().toLowerCase();
+
     const ok = await run({
       key: "email",
       loading: "Updating your email...",
@@ -395,15 +434,20 @@ export default function ProfileView({ user, hasPassword, providers }) {
       action: () =>
         // authClient.changeEmail({
         changeEmail({
-          newEmail: newEmail.trim().toLowerCase(),
+          // newEmail: newEmail.trim().toLowerCase(),
+          newEmail: requested,
           callbackURL: "/profile",
         }),
 
       success: {
-        title: user.emailVerified ? "Check your inbox" : "Email updated",
+        title: user.emailVerified
+          ? "Check your current inbox"
+          : "Email updated",
         description: user.emailVerified
-          ? "We sent a confirmation link. Your email changes once you approve it."
-          : "Your email address has been changed.",
+          ? `We sent an approval link to ${user.email}. After you approve it, we'll verify ${requested}.`
+          : `Your email is now ${requested}.`,
+
+        // description: user.emailVerified ? "We sent a confirmation link. Your email changes once you approve it." : "Your email address has been changed.",
       },
     });
 
@@ -629,7 +673,8 @@ export default function ProfileView({ user, hasPassword, providers }) {
           <aside className="space-y-6">
             <nav
               aria-label="Profile sections"
-              className="flex gap-2 overflow-x-auto rounded-3xl border border-white/10 bg-white/3 p-2 backdrop-blur-2xl md:flex-col md:overflow-visible"
+              // className="flex flex-wrap"
+              className="flex gap-2 overflow-x-auto rounded-3xl border border-white/10 bg-white/3 p-1 backdrop-blur-2xl md:flex-col md:overflow-visible sm:p-1.5 md:p-2"
             >
               {tabs.map(({ id, label, hint, icon: Icon }) => {
                 const active = tab === id;
@@ -640,7 +685,7 @@ export default function ProfileView({ user, hasPassword, providers }) {
                     type="button"
                     onClick={() => setTab(id)}
                     aria-current={active ? "page" : undefined}
-                    className={`group relative flex shrink-0 cursor-pointer items-center gap-3 overflow-hidden rounded-2xl px-3.5 py-3 text-left transition-all duration-300 lg:w-full ${
+                    className={`group relative flex shrink-0 cursor-pointer items-center gap-1.5 overflow-hidden rounded-2xl px-2 py-1.5 text-left transition-all duration-300 md:w-full md:px-3.5 md:py-3 md:gap-3 ${
                       active
                         ? "bg-linear-to-r from-lime-300/15 to-violet-500/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
                         : "text-slate-400 hover:bg-white/5 hover:text-white"
@@ -653,21 +698,24 @@ export default function ProfileView({ user, hasPassword, providers }) {
                     />
 
                     <span
-                      className={`grid size-10 shrink-0 place-items-center rounded-xl border transition-all duration-300 ${
+                      className={`grid size-6 shrink-0 place-items-center rounded-xl border transition-all duration-300 sm:size-7 md:size-10 ${
                         active
                           ? "border-lime-300/30 bg-lime-300/15 text-lime-200"
                           : "border-white/10 bg-white/4 text-slate-400 group-hover:text-violet-300"
                       }`}
                     >
-                      <Icon size={18} />
+                      <Icon
+                        className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-4.5 md:h-4.5"
+                        // size={18}
+                      />
                     </span>
 
-                    <span className="pr-2">
-                      <span className="block text-sm font-semibold">
+                    <span className="pr-0 sm:pr-1 md:pr-2">
+                      <span className="block text-xs font-semibold md:text-sm">
                         {label}
                       </span>
 
-                      <span className="hidden text-xs text-slate-500 lg:block">
+                      <span className="hidden text-xs text-slate-500 md:block">
                         {hint}
                       </span>
                     </span>
@@ -792,20 +840,21 @@ export default function ProfileView({ user, hasPassword, providers }) {
                 title="Email address"
                 description="Change the address you use to sign in and receive messages."
               >
-                <div className="mb-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/3 p-4">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-violet-300">
-                    <Mail size={18} />
+                {/* Current email card */}
+                <div className="mb-6 flex items-center gap-1 rounded-2xl border border-white/10 bg-white/3 p-2">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-violet-300 sm:size-10">
+                    <Mail className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                   </span>
 
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-slate-500">Current email</p>
-                    <p className="truncate text-sm font-semibold">
+                    <p className="truncate text-xs font-semibold sm:text-sm">
                       {user.email}
                     </p>
                   </div>
 
                   <span
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                    className={`rounded-full px-2 py-1 text-[11px] font-semibold sm:px-2.5 ${
                       user.emailVerified
                         ? "bg-lime-300/10 text-lime-300"
                         : "bg-amber-300/10 text-amber-200"
@@ -814,6 +863,49 @@ export default function ProfileView({ user, hasPassword, providers }) {
                     {user.emailVerified ? "Verified" : "Unverified"}
                   </span>
                 </div>
+
+                {/* Unverified banner: now outside the card */}
+                {!user.emailVerified && (
+                  <div
+                    role="alert"
+                    className="mb-6 rounded-2xl border border-amber-300/25 bg-amber-300/10 p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-amber-300/15 text-amber-200">
+                        <MailWarning size={18} />
+                      </span>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-amber-100">
+                          Your email isn't verified
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-amber-200/70">
+                          Verify it to secure your account and enable email
+                          changes. The link expires in 7 days.
+                        </p>
+
+                        <button
+                          type="button"
+                          onClick={handleResend}
+                          disabled={cooldown > 0 || Boolean(busy)}
+                          className="group mt-3 inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 text-sm font-semibold text-amber-100 transition hover:bg-amber-300/20 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {busy === "resend" ? (
+                            <LoaderCircle size={16} className="animate-spin" />
+                          ) : (
+                            <RefreshCw
+                              size={16}
+                              className="transition-transform duration-500 group-hover:rotate-180"
+                            />
+                          )}
+                          {cooldown > 0
+                            ? `Resend in ${cooldown}s`
+                            : "Resend verification email"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <Form className="flex flex-col gap-6" onSubmit={handleEmail}>
                   <IconField
@@ -826,7 +918,7 @@ export default function ProfileView({ user, hasPassword, providers }) {
                     onChange={setNewEmail}
                     hint={
                       user.emailVerified
-                        ? "We'll email you a link to confirm the change."
+                        ? "We'll send an approval link to your current email, then verify the new one."
                         : "Your email will be updated right away."
                     }
                     validate={(v) =>

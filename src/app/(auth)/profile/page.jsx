@@ -26,7 +26,10 @@ export default async function ProfilePage() {
 
   try {
     const accounts = await auth.api.listUserAccounts({ headers: h });
-    providers = accounts.map((a) => a.providerId ?? a.provider);
+
+    // providers = accounts.map((a) => a.providerId ?? a.provider);
+
+    providers = accounts.map((a) => a.providerId ?? a.providerId);
   } catch {}
 
   const { user } = session;

@@ -35,9 +35,19 @@ function template({ preview, title, greeting, body, buttonLabel, url, note }) {
                 <p style="margin:0 0 24px;font-size:15px;font-weight:700;color:#ffffff;letter-spacing:-0.2px;">
                   ${escapeHtml(siteConfig.name)}
                 </p>
-                <h1 style="margin:0 0 12px;font-size:26px;line-height:1.25;color:#ffffff;letter-spacing:-0.4px;">${title}</h1>
-                <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#cbd5e1;">${greeting}</p>
-                <p style="margin:0 0 28px;font-size:15px;line-height:1.7;color:#94a3b8;">${body}</p>
+
+                <h1 style="margin:0 0 12px;font-size:26px;line-height:1.25;color:#ffffff;letter-spacing:-0.4px;">
+                  ${title}
+                </h1>
+                
+                <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#cbd5e1;">
+                  ${greeting}
+                </p>
+                
+                <p style="margin:0 0 28px;font-size:15px;line-height:1.7;color:#94a3b8;">
+                  ${body}
+                </p>
+                
                 <a href="${url}" style="display:inline-block;padding:14px 28px;background:#bef264;color:#0b0c0e;font-size:15px;font-weight:700;text-decoration:none;border-radius:14px;">
                   ${buttonLabel}
                 </a>
@@ -46,16 +56,28 @@ function template({ preview, title, greeting, body, buttonLabel, url, note }) {
             <tr>
 
               <td style="padding:28px 36px 8px;">
-                <p style="margin:0 0 6px;font-size:12px;color:#64748b;">Button not working? Copy and paste this link into your browser:</p>
-                <p style="margin:0;font-size:12px;line-height:1.6;word-break:break-all;"><a href="${url}" style="color:#a78bfa;text-decoration:none;">${url}</a></p>
+                <p style="margin:0 0 6px;font-size:12px;color:#64748b;">
+                  Button not working? Copy and paste this link into your browser:
+                </p>
+                
+                <p style="margin:0;font-size:12px;line-height:1.6;word-break:break-all;">
+                  <a href="${url}" style="color:#a78bfa;text-decoration:none;">
+                    ${url}
+                  </a>
+                </p>
               </td>
             </tr>
             
             <tr>
               <td style="padding:24px 36px 36px;">
                 <div style="border-top:1px solid #23253a;padding-top:20px;">
-                  <p style="margin:0;font-size:12px;line-height:1.7;color:#64748b;">${note}</p>
-                  <p style="margin:12px 0 0;font-size:12px;color:#475569;">© ${new Date().getFullYear()} ${escapeHtml(siteConfig.name)}</p>
+                  <p style="margin:0;font-size:12px;line-height:1.7;color:#64748b;">
+                    ${note}
+                  </p>
+                  
+                  <p style="margin:12px 0 0;font-size:12px;color:#475569;">
+                    © ${new Date().getFullYear()} ${escapeHtml(siteConfig.name)}
+                  </p>
                 </div>
               </td>
             </tr>
@@ -76,7 +98,10 @@ async function send({ to, subject, html }) {
       html,
     });
 
-    if (error) console.error("[email] Resend error:", error);
+    if (error) {
+      console.error("[email] Resend error:", error);
+      throw new Error("Failed to send email");
+    }
   } catch (err) {
     console.error("[email] Failed to send:", err);
   }
@@ -87,6 +112,7 @@ export const sendVerificationEmail = ({ user, url }) =>
   send({
     to: user.email,
     subject: `Verify your email for ${siteConfig.name}`,
+
     html: template({
       preview: "Confirm your email address to finish setting up your account.",
       title: "Verify your email",

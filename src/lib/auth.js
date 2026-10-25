@@ -16,12 +16,13 @@ const client =
     process.env.BETTER_AUTH_DB_URL,
   ));
 
-const db = client.db("better-auth-db");
+export const db = client.db("better-auth-db");
 
 export const auth = betterAuth({
   appName: "NextAuth Pro",
   baseURL: process.env.BETTER_AUTH_URL,
   secret: process.env.BETTER_AUTH_SECRET,
+  // trustedOrigins: ["http://localhost:3000"],
 
   database: mongodbAdapter(db, { client }),
 
@@ -32,10 +33,14 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     resetPasswordTokenExpiresIn: 60 * 60, // 1 hour
 
+    // sendResetPassword: async ({ user, url, token }, request) => {}
+
     // `void` = don't await, so response time can't reveal whether an account exists
     sendResetPassword: async ({ user, url }) => {
       void sendResetPasswordEmail({ user, url });
     },
+
+    revokeSessionsOnPasswordReset: true,
   },
 
   /* ---------- Email verification ---------- */
@@ -57,6 +62,8 @@ export const auth = betterAuth({
       // Sent to the CURRENT address so a hijacked session can't silently swap the email.
       // In newer Better Auth versions this option is named `sendChangeEmailConfirmation`.
       sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+        console.log("[change-email] sending to", user.email, "→", newEmail);
+
         void sendChangeEmailConfirmation({ user, newEmail, url });
       },
     },

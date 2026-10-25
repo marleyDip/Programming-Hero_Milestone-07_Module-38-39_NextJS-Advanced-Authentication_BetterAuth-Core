@@ -9,12 +9,13 @@ export const {
   signIn,
   signUp,
   signOut,
-  updateUser,
+  useSession,
   changeEmail,
+  changePassword,
+  updateUser,
   requestPasswordReset,
   resetPassword,
-  useSession,
-  changePassword,
+  sendVerificationEmail,
 } = createAuthClient();
 
 /**

@@ -12,6 +12,7 @@ import {
   TextField,
 } from "@heroui/react";
 import {
+  ArrowLeft,
   ArrowRight,
   Check,
   Eye,
@@ -19,7 +20,9 @@ import {
   LoaderCircle,
   LockKeyhole,
   Mail,
+  MailCheck,
   MoveRight,
+  RefreshCw,
   RotateCcw,
   ShieldCheck,
   Sparkles,
@@ -33,12 +36,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { emailExists } from "@/app/actions/check-email";
 import { signIn, signUp } from "@/lib/auth-client";
 
 const inputClass =
   "h-12 w-full rounded-2xl border border-white/10 bg-white/4 pl-11 text-white placeholder:text-slate-500 transition focus-within:border-lime-300/60 focus-within:bg-white/6 focus-within:ring-4 focus-within:ring-lime-300/10";
 
 const providerNames = { google: "Google", github: "GitHub" };
+const RESEND_COOLDOWN = 60;
 
 const steps = [
   {
@@ -118,6 +123,90 @@ function Brand() {
   );
 }
 
+function VerifyNotice({ email, cooldown, resending, onResend, onBack }) {
+  return (
+    <div className="text-center">
+      <div className="mx-auto mb-5 grid size-14 place-items-center rounded-2xl border border-lime-300/25 bg-lime-300/10 text-lime-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+        <MailCheck size={28} />
+      </div>
+
+      <h1 className="text-3xl font-bold tracking-tight">
+        Verify your{" "}
+        <span className="bg-linear-to-r from-lime-300 via-emerald-200 to-cyan-300 bg-clip-text text-transparent">
+          email
+        </span>
+      </h1>
+
+      <p className="mt-3 text-sm leading-6 text-slate-400">
+        We sent a verification link to{" "}
+        <span className="font-semibold text-slate-200">{email}</span>. Click it
+        to activate your account. It expires in 7 days.
+      </p>
+
+      {/* <div className="mt-6 rounded-2xl border border-white/10 bg-white/3 p-4 text-left text-xs leading-5 text-slate-400">
+        Nothing yet? Check your spam folder, or make sure the address is spelled
+        correctly.
+      </div> */}
+
+      <div className="mt-6 rounded-2xl border border-white/10 bg-white/3 p-4 text-left text-xs leading-5 text-slate-400">
+        Nothing yet? Check your spam folder. If you already have an account with
+        this email, you won&apos;t get a new link.{" "}
+        <Link
+          href="/sign-in"
+          className="font-semibold text-lime-300 hover:underline"
+        >
+          Sign in
+        </Link>{" "}
+        or{" "}
+        <Link
+          href="/forgot-password"
+          className="font-semibold text-lime-300 hover:underline"
+        >
+          reset your password
+        </Link>
+        .
+      </div>
+
+      <div className="mt-6 flex flex-col gap-3">
+        <Button
+          type="button"
+          variant="secondary"
+          isDisabled={cooldown > 0 || resending}
+          onPress={onResend}
+          className="h-12 rounded-2xl border border-white/10 bg-white/4 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/8 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {resending ? (
+            <LoaderCircle size={18} className="animate-spin" />
+          ) : (
+            <RefreshCw size={16} />
+          )}
+          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend email"}
+        </Button>
+
+        <Link
+          href="/sign-in"
+          className="group relative flex h-12 items-center justify-center gap-2 overflow-hidden rounded-2xl bg-linear-to-r from-lime-300 via-lime-200 to-emerald-300 font-semibold text-[#0b0c0e] shadow-[0_8px_30px_rgba(190,242,100,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(190,242,100,0.4)]"
+        >
+          Go to sign in
+          <ArrowRight
+            size={18}
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          />
+        </Link>
+
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex cursor-pointer items-center justify-center gap-1.5 text-sm text-slate-400 transition hover:text-white"
+        >
+          <ArrowLeft size={14} />
+          Use a different email
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function SignUpForm() {
   const router = useRouter();
   const cardRef = useRef(null);
@@ -126,6 +215,10 @@ export default function SignUpForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState("");
+
+  const [sentTo, setSentTo] = useState(""); // set after a successful sign-up
+  const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
 
   // Only for the strength meter + confirm validation
   const [password, setPassword] = useState("");
@@ -142,6 +235,12 @@ export default function SignUpForm() {
         : "bg-lime-300";
 
   const busy = loading || Boolean(socialLoading);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [cooldown]);
 
   useEffect(() => {
     const reset = () => setSocialLoading("");
@@ -183,45 +282,92 @@ export default function SignUpForm() {
       return;
     }
 
+    const email = String(data.email).trim().toLowerCase();
+
     setLoading(true);
+
     const toastId = toast.loading("Creating your account...", {
       description: "This will only take a moment.",
     });
 
     try {
+      if (await emailExists(email)) {
+        toast.error("Account already exists", {
+          id: toastId,
+          description: "This email is already registered. Sign in instead.",
+          action: { label: "Sign in", onClick: () => router.push("/sign-in") },
+        });
+        return;
+      }
+
       const { error } = await signUp.email({
         name: data.name,
-        email: data.email,
+        // email: data.email,
+        email,
         password: data.password,
-        callbackURL: "/",
+        callbackURL: "/", // where the verification link sends them
       });
 
       if (error) {
         toast.error("Sign up failed", {
           id: toastId,
-
           description: error.message || "Unable to create your account.",
         });
-
         return;
       }
 
       toast.success("Account created", {
         id: toastId,
-
-        description: "Welcome aboard! Redirecting you now...",
+        description: "Check your inbox to verify your email.",
+        // description: "Welcome aboard! Redirecting you now...",
       });
 
-      router.push("/");
-      router.refresh();
+      setSentTo(email);
+      setCooldown(RESEND_COOLDOWN);
+      setPassword("");
+
+      // router.push("/");
+      // router.refresh();
     } catch {
       toast.error("Something went wrong", {
         id: toastId,
-
         description: "Please try again in a moment.",
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResending(true);
+    const toastId = toast.loading("Sending verification email...");
+
+    try {
+      const { error } = await sendVerificationEmail({
+        email: sentTo,
+        callbackURL: "/",
+      });
+
+      if (error) {
+        toast.error("Couldn't send the email", {
+          id: toastId,
+          description: error.message || "Please try again.",
+        });
+        return;
+      }
+
+      toast.success("Verification email sent", {
+        id: toastId,
+        description: `Check ${sentTo}, including your spam folder.`,
+      });
+      setCooldown(RESEND_COOLDOWN);
+    } catch {
+      toast.error("Something went wrong", {
+        id: toastId,
+        description: "Please try again in a moment.",
+      });
+    } finally {
+      setResending(false);
     }
   };
 
@@ -343,343 +489,360 @@ export default function SignUpForm() {
                 <div className="spotlight pointer-events-none absolute inset-0" />
 
                 <div className="relative">
-                  {/* Heading */}
-                  <div className="mb-7 text-center">
-                    <div className="mx-auto mb-5 grid size-14 place-items-center rounded-2xl border border-white/10 bg-linear-to-br from-lime-300/20 to-violet-500/20 text-lime-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-                      <UserPlus size={28} />
-                    </div>
+                  {sentTo ? (
+                    <VerifyNotice
+                      email={sentTo}
+                      cooldown={cooldown}
+                      resending={resending}
+                      onResend={handleResend}
+                      onBack={() => setSentTo("")}
+                    />
+                  ) : (
+                    <>
+                      {/* Heading */}
+                      <div className="mb-7 text-center">
+                        <div className="mx-auto mb-5 grid size-14 place-items-center rounded-2xl border border-white/10 bg-linear-to-br from-lime-300/20 to-violet-500/20 text-lime-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <UserPlus size={28} />
+                        </div>
 
-                    <h1 className="text-3xl font-bold tracking-tight">
-                      Create your{" "}
-                      <span className="bg-linear-to-r from-lime-300 via-emerald-200 to-cyan-300 bg-clip-text text-transparent">
-                        account
-                      </span>
-                    </h1>
+                        <h1 className="text-3xl font-bold tracking-tight">
+                          Create your{" "}
+                          <span className="bg-linear-to-r from-lime-300 via-emerald-200 to-cyan-300 bg-clip-text text-transparent">
+                            account
+                          </span>
+                        </h1>
 
-                    <Description className="mt-2 text-sm text-slate-400">
-                      Fill in your details to get started.
-                    </Description>
-                  </div>
+                        <Description className="mt-2 text-sm text-slate-400">
+                          Fill in your details to get started.
+                        </Description>
+                      </div>
 
-                  {/* Form */}
-                  <Form
-                    className="flex flex-col gap-5"
-                    onSubmit={handleSubmit}
-                    // onReset={handleReset}
-                  >
-                    <Fieldset className="w-full">
-                      <FieldGroup className="gap-4">
-                        {/* Name */}
-                        <TextField
-                          name="name"
-                          isRequired
-                          validate={(value) =>
-                            value.trim().length < 3
-                              ? "Name must be at least 3 characters"
-                              : null
-                          }
-                        >
-                          <Label className="mb-2 block text-sm font-medium text-slate-300">
-                            Full name
-                          </Label>
-
-                          <div className="relative w-full">
-                            <UserRound
-                              size={17}
-                              className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-500"
-                            />
-
-                            <Input
-                              fullWidth
-                              className={inputClass}
-                              placeholder="Your name"
-                              autoComplete="name"
-                            />
-                          </div>
-
-                          <FieldError />
-                        </TextField>
-
-                        {/* Email */}
-                        <TextField
-                          name="email"
-                          type="email"
-                          isRequired
-                          validate={(value) =>
-                            /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
-                              value,
-                            )
-                              ? null
-                              : "Please enter a valid email address"
-                          }
-                        >
-                          <Label className="mb-2 block text-sm font-medium text-slate-300">
-                            Email
-                          </Label>
-
-                          <div className="relative w-full">
-                            <Mail
-                              size={17}
-                              className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-500"
-                            />
-
-                            <Input
-                              fullWidth
-                              className={inputClass}
-                              placeholder="you@example.com"
-                              autoComplete="email"
-                            />
-                          </div>
-
-                          <FieldError />
-                        </TextField>
-
-                        {/* Password */}
-                        <TextField
-                          className="w-full"
-                          name="password"
-                          isRequired
-                          onChange={setPassword}
-                          validate={(value) => {
-                            if (value.length < 8)
-                              return "Password must be at least 8 characters";
-                            if (!/[A-Z]/.test(value))
-                              return "Password must contain at least one uppercase letter";
-                            if (!/[0-9]/.test(value))
-                              return "Password must contain at least one number";
-                            return null;
-                          }}
-                        >
-                          <Label className="mb-2 block text-sm font-medium text-slate-300">
-                            Password
-                          </Label>
-
-                          <div className="relative w-full">
-                            <LockKeyhole
-                              size={17}
-                              className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-500"
-                            />
-
-                            <Input
-                              fullWidth
-                              className={`${inputClass} pr-12`}
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Create a strong password"
-                              autoComplete="new-password"
-                            />
-
-                            <button
-                              type="button"
-                              aria-label={
-                                showPassword ? "Hide password" : "Show password"
+                      {/* Form */}
+                      <Form
+                        className="flex flex-col gap-5"
+                        onSubmit={handleSubmit}
+                        // onReset={handleReset}
+                      >
+                        <Fieldset className="w-full">
+                          <FieldGroup className="gap-4">
+                            {/* Name */}
+                            <TextField
+                              name="name"
+                              isRequired
+                              validate={(value) =>
+                                value.trim().length < 3
+                                  ? "Name must be at least 3 characters"
+                                  : null
                               }
-                              onClick={() => setShowPassword((prev) => !prev)}
-                              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-md p-1 text-slate-400 transition hover:text-white"
                             >
-                              {showPassword ? (
-                                <EyeOff size={18} />
-                              ) : (
-                                <Eye size={18} />
-                              )}
-                            </button>
-                          </div>
+                              <Label className="mb-2 block text-sm font-medium text-slate-300">
+                                Full name
+                              </Label>
 
-                          <Description className="mt-2 text-xs text-slate-500">
-                            At least 8 characters with 1 uppercase and 1 number
-                          </Description>
+                              <div className="relative w-full">
+                                <UserRound
+                                  size={17}
+                                  className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-500"
+                                />
 
-                          <FieldError />
-
-                          {password && (
-                            <div className="mt-3">
-                              <div className="flex gap-1.5">
-                                {[1, 2, 3, 4, 5].map((level) => (
-                                  <div
-                                    key={level}
-                                    className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                                      strength >= level
-                                        ? strengthColor
-                                        : "bg-white/10"
-                                    }`}
-                                  />
-                                ))}
+                                <Input
+                                  fullWidth
+                                  className={inputClass}
+                                  placeholder="Your name"
+                                  autoComplete="name"
+                                />
                               </div>
 
-                              <p className="mt-2 text-xs text-slate-400">
-                                Password strength:{" "}
-                                <span className="font-medium text-slate-200">
-                                  {strengthLabel}
-                                </span>
-                              </p>
-                            </div>
-                          )}
-                        </TextField>
+                              <FieldError />
+                            </TextField>
 
-                        {/* Confirm password */}
-                        <TextField
-                          className="w-full"
-                          name="confirmPassword"
-                          isRequired
-                          validate={(value) =>
-                            value !== password
-                              ? "Passwords do not match."
-                              : null
-                          }
-                        >
-                          <Label className="mb-2 block text-sm font-medium text-slate-300">
-                            Confirm password
-                          </Label>
-
-                          <div className="relative w-full">
-                            <LockKeyhole
-                              size={17}
-                              className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-500"
-                            />
-
-                            <Input
-                              fullWidth
-                              className={`${inputClass} pr-12`}
-                              type={showConfirmPassword ? "text" : "password"}
-                              placeholder="Confirm your password"
-                              autoComplete="new-password"
-                            />
-
-                            <button
-                              type="button"
-                              aria-label={
-                                showConfirmPassword
-                                  ? "Hide confirm password"
-                                  : "Show confirm password"
+                            {/* Email */}
+                            <TextField
+                              name="email"
+                              type="email"
+                              isRequired
+                              validate={(value) =>
+                                /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
+                                  value,
+                                )
+                                  ? null
+                                  : "Please enter a valid email address"
                               }
-                              onClick={() =>
-                                setShowConfirmPassword((prev) => !prev)
-                              }
-                              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-md p-1 text-slate-400 transition hover:text-white"
                             >
-                              {showConfirmPassword ? (
-                                <EyeOff size={18} />
-                              ) : (
-                                <Eye size={18} />
+                              <Label className="mb-2 block text-sm font-medium text-slate-300">
+                                Email
+                              </Label>
+
+                              <div className="relative w-full">
+                                <Mail
+                                  size={17}
+                                  className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-500"
+                                />
+
+                                <Input
+                                  fullWidth
+                                  className={inputClass}
+                                  placeholder="you@example.com"
+                                  autoComplete="email"
+                                />
+                              </div>
+
+                              <FieldError />
+                            </TextField>
+
+                            {/* Password */}
+                            <TextField
+                              className="w-full"
+                              name="password"
+                              isRequired
+                              onChange={setPassword}
+                              validate={(value) => {
+                                if (value.length < 8)
+                                  return "Password must be at least 8 characters";
+                                if (!/[A-Z]/.test(value))
+                                  return "Password must contain at least one uppercase letter";
+                                if (!/[0-9]/.test(value))
+                                  return "Password must contain at least one number";
+                                return null;
+                              }}
+                            >
+                              <Label className="mb-2 block text-sm font-medium text-slate-300">
+                                Password
+                              </Label>
+
+                              <div className="relative w-full">
+                                <LockKeyhole
+                                  size={17}
+                                  className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-500"
+                                />
+
+                                <Input
+                                  fullWidth
+                                  className={`${inputClass} pr-12`}
+                                  type={showPassword ? "text" : "password"}
+                                  placeholder="Create a strong password"
+                                  autoComplete="new-password"
+                                />
+
+                                <button
+                                  type="button"
+                                  aria-label={
+                                    showPassword
+                                      ? "Hide password"
+                                      : "Show password"
+                                  }
+                                  onClick={() =>
+                                    setShowPassword((prev) => !prev)
+                                  }
+                                  className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-md p-1 text-slate-400 transition hover:text-white"
+                                >
+                                  {showPassword ? (
+                                    <EyeOff size={18} />
+                                  ) : (
+                                    <Eye size={18} />
+                                  )}
+                                </button>
+                              </div>
+
+                              <Description className="mt-2 text-xs text-slate-500">
+                                At least 8 characters with 1 uppercase and 1
+                                number
+                              </Description>
+
+                              <FieldError />
+
+                              {password && (
+                                <div className="mt-3">
+                                  <div className="flex gap-1.5">
+                                    {[1, 2, 3, 4, 5].map((level) => (
+                                      <div
+                                        key={level}
+                                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
+                                          strength >= level
+                                            ? strengthColor
+                                            : "bg-white/10"
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+
+                                  <p className="mt-2 text-xs text-slate-400">
+                                    Password strength:{" "}
+                                    <span className="font-medium text-slate-200">
+                                      {strengthLabel}
+                                    </span>
+                                  </p>
+                                </div>
                               )}
-                            </button>
-                          </div>
-                          <FieldError />
-                        </TextField>
-                      </FieldGroup>
-                    </Fieldset>
+                            </TextField>
 
-                    {/* Submit Neo-Glass Button */}
-                    <div className="flex items-stretch gap-3">
-                      <Button
-                        type="submit"
-                        isDisabled={busy}
-                        className="group relative w-full h-12 overflow-hidden rounded-xl border border-violet-400/25 bg-[#171323] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 hover:border-violet-400/60 hover:bg-[#211a35] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_25px_rgba(139,92,246,0.18)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <span className="pointer-events-none absolute inset-0 bg-linear-to-r from-violet-500/8 via-fuchsia-400/4 to-indigo-500/8 opacity-70 transition-opacity duration-300 group-hover:opacity-100" />
+                            {/* Confirm password */}
+                            <TextField
+                              className="w-full"
+                              name="confirmPassword"
+                              isRequired
+                              validate={(value) =>
+                                value !== password
+                                  ? "Passwords do not match."
+                                  : null
+                              }
+                            >
+                              <Label className="mb-2 block text-sm font-medium text-slate-300">
+                                Confirm password
+                              </Label>
 
-                        <span className="pointer-events-none absolute -left-1/2 top-0 h-px w-1/2 bg-linear-to-r from-transparent via-violet-300 to-transparent transition-transform duration-700 group-hover:translate-x-[300%]" />
+                              <div className="relative w-full">
+                                <LockKeyhole
+                                  size={17}
+                                  className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-slate-500"
+                                />
 
-                        <span className="relative flex items-center justify-center gap-2.5">
-                          {loading ? (
-                            <>
-                              <LoaderCircle
-                                size={18}
-                                className="animate-spin text-violet-300"
-                              />
-                              Creating account...
-                            </>
+                                <Input
+                                  fullWidth
+                                  className={`${inputClass} pr-12`}
+                                  type={
+                                    showConfirmPassword ? "text" : "password"
+                                  }
+                                  placeholder="Confirm your password"
+                                  autoComplete="new-password"
+                                />
+
+                                <button
+                                  type="button"
+                                  aria-label={
+                                    showConfirmPassword
+                                      ? "Hide confirm password"
+                                      : "Show confirm password"
+                                  }
+                                  onClick={() =>
+                                    setShowConfirmPassword((prev) => !prev)
+                                  }
+                                  className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-md p-1 text-slate-400 transition hover:text-white"
+                                >
+                                  {showConfirmPassword ? (
+                                    <EyeOff size={18} />
+                                  ) : (
+                                    <Eye size={18} />
+                                  )}
+                                </button>
+                              </div>
+                              <FieldError />
+                            </TextField>
+                          </FieldGroup>
+                        </Fieldset>
+
+                        {/* Submit Neo-Glass Button */}
+                        <div className="flex items-stretch gap-3">
+                          <Button
+                            type="submit"
+                            isDisabled={busy}
+                            className="group relative w-full h-12 overflow-hidden rounded-xl border border-violet-400/25 bg-[#171323] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 hover:border-violet-400/60 hover:bg-[#211a35] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_25px_rgba(139,92,246,0.18)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <span className="pointer-events-none absolute inset-0 bg-linear-to-r from-violet-500/8 via-fuchsia-400/4 to-indigo-500/8 opacity-70 transition-opacity duration-300 group-hover:opacity-100" />
+
+                            <span className="pointer-events-none absolute -left-1/2 top-0 h-px w-1/2 bg-linear-to-r from-transparent via-violet-300 to-transparent transition-transform duration-700 group-hover:translate-x-[300%]" />
+
+                            <span className="relative flex items-center justify-center gap-2.5">
+                              {loading ? (
+                                <>
+                                  <LoaderCircle
+                                    size={18}
+                                    className="animate-spin text-violet-300"
+                                  />
+                                  Creating account...
+                                </>
+                              ) : (
+                                <>
+                                  <span className="flex size-7 items-center justify-center rounded-lg border border-violet-300/20 bg-violet-400/10 text-violet-300 transition-all duration-300 group-hover:border-violet-300/40 group-hover:bg-violet-400/20">
+                                    <UserPlus size={16} />
+                                  </span>
+
+                                  <span className="tracking-wide">
+                                    Create Account
+                                  </span>
+
+                                  <ArrowRight
+                                    size={17}
+                                    className="text-violet-300 transition-transform duration-300 group-hover:translate-x-1"
+                                  />
+                                </>
+                              )}
+                            </span>
+                          </Button>
+
+                          {/* Reset Button */}
+                          <Button
+                            type="reset"
+                            variant="secondary"
+                            isDisabled={busy}
+                            aria-label="Reset form"
+                            className="group relative h-12 flex items-center justify-center gap-2 overflow-hidden rounded-xl border border-white/10 bg-white/5 px-5 font-semibold text-slate-300 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.25),6px_6px_16px_rgba(0,0,0,0.35),-4px_-4px_12px_rgba(255,255,255,0.04)] transition-all duration-300 hover:border-violet-400/40 hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),inset_0_-1px_0_rgba(0,0,0,0.3),8px_8px_20px_rgba(0,0,0,0.4),-5px_-5px_14px_rgba(255,255,255,0.05),0_0_22px_rgba(139,92,246,0.15)] active:scale-[0.97] active:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.45),inset_-3px_-3px_8px_rgba(255,255,255,0.05)] disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {/* Soft glass sheen */}
+                            <span className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
+
+                            {/* Light sweep on hover */}
+                            <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
+                            <span className="relative flex items-center gap-2">
+                              <span className="flex size-7 items-center justify-center rounded-lg bg-white/4 text-violet-300 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.4),inset_-1px_-1px_3px_rgba(255,255,255,0.06)] transition-all duration-300 group-hover:text-violet-200">
+                                <RotateCcw
+                                  size={15}
+                                  className="transition-transform duration-500 group-hover:-rotate-180"
+                                />
+                              </span>
+
+                              <span className="hidden tracking-wide sm:inline">
+                                Reset
+                              </span>
+                            </span>
+                          </Button>
+                        </div>
+                      </Form>
+
+                      {/* Divider */}
+                      <div className="my-6 flex items-center gap-4">
+                        <div className="h-px flex-1 bg-linear-to-r from-transparent to-white/15" />
+                        <span className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                          or continue with
+                        </span>
+                        <div className="h-px flex-1 bg-linear-to-l from-transparent to-white/15" />
+                      </div>
+
+                      {/* Social sign-up */}
+                      <div className="grid lg:grid-cols-2 gap-3">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          isDisabled={busy}
+                          onPress={() => handleSocialSignUp("google")}
+                          className="w-full h-10 rounded-xl border border-white/10 bg-white/4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/8 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {socialLoading === "google" ? (
+                            <LoaderCircle size={18} className="animate-spin" />
                           ) : (
-                            <>
-                              <span className="flex size-7 items-center justify-center rounded-lg border border-violet-300/20 bg-violet-400/10 text-violet-300 transition-all duration-300 group-hover:border-violet-300/40 group-hover:bg-violet-400/20">
-                                <UserPlus size={16} />
-                              </span>
-
-                              <span className="tracking-wide">
-                                Create Account
-                              </span>
-
-                              <ArrowRight
-                                size={17}
-                                className="text-violet-300 transition-transform duration-300 group-hover:translate-x-1"
-                              />
-                            </>
+                            <GoogleIcon />
                           )}
-                        </span>
-                      </Button>
+                          Continue with Google
+                        </Button>
 
-                      {/* Reset Button */}
-                      <Button
-                        type="reset"
-                        variant="secondary"
-                        isDisabled={busy}
-                        aria-label="Reset form"
-                        className="group relative h-12 flex items-center justify-center gap-2 overflow-hidden rounded-xl border border-white/10 bg-white/5 px-5 font-semibold text-slate-300 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.25),6px_6px_16px_rgba(0,0,0,0.35),-4px_-4px_12px_rgba(255,255,255,0.04)] transition-all duration-300 hover:border-violet-400/40 hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),inset_0_-1px_0_rgba(0,0,0,0.3),8px_8px_20px_rgba(0,0,0,0.4),-5px_-5px_14px_rgba(255,255,255,0.05),0_0_22px_rgba(139,92,246,0.15)] active:scale-[0.97] active:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.45),inset_-3px_-3px_8px_rgba(255,255,255,0.05)] disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {/* Soft glass sheen */}
-                        <span className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          isDisabled={busy}
+                          onPress={() => handleSocialSignUp("github")}
+                          className="w-full h-10 rounded-2xl border border-white/10 bg-white/4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/8 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {socialLoading === "github" ? (
+                            <LoaderCircle size={18} className="animate-spin" />
+                          ) : (
+                            <GithubIcon />
+                          )}
+                          Continue with GitHub
+                        </Button>
+                      </div>
 
-                        {/* Light sweep on hover */}
-                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-
-                        <span className="relative flex items-center gap-2">
-                          <span className="flex size-7 items-center justify-center rounded-lg bg-white/4 text-violet-300 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.4),inset_-1px_-1px_3px_rgba(255,255,255,0.06)] transition-all duration-300 group-hover:text-violet-200">
-                            <RotateCcw
-                              size={15}
-                              className="transition-transform duration-500 group-hover:-rotate-180"
-                            />
-                          </span>
-
-                          <span className="hidden tracking-wide sm:inline">
-                            Reset
-                          </span>
-                        </span>
-                      </Button>
-                    </div>
-                  </Form>
-
-                  {/* Divider */}
-                  <div className="my-6 flex items-center gap-4">
-                    <div className="h-px flex-1 bg-linear-to-r from-transparent to-white/15" />
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                      or continue with
-                    </span>
-                    <div className="h-px flex-1 bg-linear-to-l from-transparent to-white/15" />
-                  </div>
-
-                  {/* Social sign-up */}
-                  <div className="grid lg:grid-cols-2 gap-3">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      isDisabled={busy}
-                      onPress={() => handleSocialSignUp("google")}
-                      className="w-full h-10 rounded-xl border border-white/10 bg-white/4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/8 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {socialLoading === "google" ? (
-                        <LoaderCircle size={18} className="animate-spin" />
-                      ) : (
-                        <GoogleIcon />
-                      )}
-                      Continue with Google
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      isDisabled={busy}
-                      onPress={() => handleSocialSignUp("github")}
-                      className="w-full h-10 rounded-2xl border border-white/10 bg-white/4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/8 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {socialLoading === "github" ? (
-                        <LoaderCircle size={18} className="animate-spin" />
-                      ) : (
-                        <GithubIcon />
-                      )}
-                      Continue with GitHub
-                    </Button>
-                  </div>
-
-                  {/* <p className="mt-7 text-center text-sm text-slate-400">
+                      {/* <p className="mt-7 text-center text-sm text-slate-400">
                     Already have an account?{" "}
                     <Link
                       href="/sign-in"
@@ -689,22 +852,24 @@ export default function SignUpForm() {
                     </Link>
                   </p> */}
 
-                  <div className="mt-7 flex items-center justify-center gap-2.5 rounded-2xl border border-white/8 bg-white/3 px-4 py-3.5 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl">
-                    <span className="text-slate-400">
-                      Already have an account?
-                    </span>
+                      <div className="mt-7 flex items-center justify-center gap-2.5 rounded-2xl border border-white/8 bg-white/3 px-4 py-3.5 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl">
+                        <span className="text-slate-400">
+                          Already have an account?
+                        </span>
 
-                    <Link
-                      href="/sign-in"
-                      className="group inline-flex items-center gap-1.5 font-semibold text-violet-300 transition-colors duration-300 hover:text-fuchsia-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 rounded-md"
-                    >
-                      Sign In
-                      <ArrowRight
-                        size={15}
-                        className="transition-transform duration-300 group-hover:translate-x-1"
-                      />
-                    </Link>
-                  </div>
+                        <Link
+                          href="/sign-in"
+                          className="group inline-flex items-center gap-1.5 font-semibold text-violet-300 transition-colors duration-300 hover:text-fuchsia-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 rounded-md"
+                        >
+                          Sign In
+                          <ArrowRight
+                            size={15}
+                            className="transition-transform duration-300 group-hover:translate-x-1"
+                          />
+                        </Link>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
