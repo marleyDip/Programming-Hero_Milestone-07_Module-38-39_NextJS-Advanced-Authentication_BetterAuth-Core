@@ -67,7 +67,7 @@ The goal was to go beyond a basic login form and build something that handles th
 
 - **Protected `/profile` page**, validated on the server
 - **Update name** (the Save button enables only when the value changed)
-- **Change email** with a confirmation link sent to the current address and prevent already register email to change using emailTakenByAnotherUser
+- **Change email** with a confirmation link sent to the current address and prevent already register email to update
 - **Change password** with current, new and confirm fields and a strength meter
 - **Sign out of other devices** after a password change
 - **Resend verification email** with a 60-second cooldown
@@ -160,13 +160,12 @@ The goal was to go beyond a basic login form and build something that handles th
 │   │   │   └── profile-view.jsx     # Tabs: Account, Email, Security
 │   │   ├── user-menu.jsx            # Avatar dropdown
 │   │   └── splash-screen.jsx
-│   ├──lib/
-│   |   ├── auth.js                  # Better Auth server config
-│   |   ├── auth-client.js           # Better Auth client + named exports
-│   |   ├── email.js                 # Resend sender + HTML templates
-│   |   ├── safe-redirect.js         # Same-site redirect validator
-│   |   └── site.js                  # Site name, description, URL
-│   └── proxy.js                     # Middleware, prevent access unauthorized user
+│   └── lib/
+│       ├── auth.js                  # Better Auth server config
+│       ├── auth-client.js           # Better Auth client + named exports
+│       ├── email.js                 # Resend sender + HTML templates
+│       ├── safe-redirect.js         # Same-site redirect validator
+│       └── site.js                  # Site name, description, URL
 └── .env                             # Never committed
 ```
 
@@ -236,7 +235,7 @@ cp .env.example .env    # then fill in the values below
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open <http://localhost:3000>.
 
 ### Environment Variables
 
